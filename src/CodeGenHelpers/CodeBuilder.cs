@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
@@ -22,13 +23,15 @@ namespace CodeGenHelpers
 
         public IndentStyle IndentStyle { get; }
 
+        public IReadOnlyList<ClassBuilder> Classes => _classes.Cast<ClassBuilder>().ToList();
+
         public static CodeBuilder Create(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces) =>
             new CodeBuilder(clrNamespace, indentStyle);
 
         public static CodeBuilder Create(INamespaceSymbol namespaceSymbol, IndentStyle indentStyle = IndentStyle.Spaces) =>
             Create(namespaceSymbol.ToString(), indentStyle);
 
-        public static ClassBuilder Create(INamedTypeSymbol typeSymbol, IndentStyle indentStyle = IndentStyle.Spaces)
+        public static ClassBuilder Create(ITypeSymbol typeSymbol, IndentStyle indentStyle = IndentStyle.Spaces)
         {
             var builder = Create(typeSymbol.ContainingNamespace, indentStyle);
             return builder.AddClass(typeSymbol.Name)
@@ -50,6 +53,11 @@ namespace CodeGenHelpers
             return AddNamespaceImport(symbol.ContainingNamespace.ToString());
         }
 
+        public CodeBuilder AddNamespaceImport(INamespaceSymbol symbol)
+        {
+            return AddNamespaceImport(symbol.ToString());
+        }
+
         public ClassBuilder AddClass(string name)
         {
             var builder = new ClassBuilder(name, this);
@@ -57,15 +65,23 @@ namespace CodeGenHelpers
             return builder;
         }
 
-        public string Build()
+        public ClassBuilder AddClass(ITypeSymbol symbol)
+        {
+            return AddClass(symbol.Name);
+        }
+
+        private CodeWriter BuildInternal()
         {
             var writer = new CodeWriter(IndentStyle);
-            WriteNamespace(_namespaceImports.Distinct()
-                .Where(x => x.StartsWith("System"))
-                .OrderBy(x => x), ref writer);
-            WriteNamespace(_namespaceImports.Distinct()
-                .Where(x => !x.StartsWith("System"))
-                .OrderBy(x => x), ref writer);
+            var namespaces = _namespaceImports.Distinct().ToList();
+            var systemNamespaces = GetImports(ref namespaces, x => x.StartsWith("System"));
+            var nonsystemNamespaces = GetImports(ref namespaces, x => !x.StartsWith("System") && !x.Contains("=") && !x.Contains("static"));
+            var namespaceAlias = GetImports(ref namespaces, x => x.Contains("="));
+
+            WriteNamespace(systemNamespaces, ref writer);
+            WriteNamespace(nonsystemNamespaces, ref writer);
+            WriteNamespace(namespaceAlias, ref writer);
+            WriteNamespace(namespaces, ref writer);
 
             writer.NewLine();
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
@@ -73,7 +89,7 @@ namespace CodeGenHelpers
 
             using (writer.Block($"namespace {Namespace}"))
             {
-                while(_classes.Any())
+                while (_classes.Any())
                 {
                     var output = _classes.Dequeue();
                     output.Write(ref writer);
@@ -83,7 +99,29 @@ namespace CodeGenHelpers
                 }
             }
 
+            return writer;
+        }
+
+        private static IEnumerable<string> GetImports(ref List<string> namespaces, Func<string, bool> predicate)
+        {
+            var output = namespaces.Where(predicate).ToArray();
+            foreach (var str in output)
+                namespaces.Remove(str);
+
+            return output.OrderBy(x => x);
+        }
+
+        public string Build()
+        {
+            var writer = BuildInternal();
             return writer.ToString();
+        }
+
+        public string BuildSafe()
+        {
+            var writer = BuildInternal();
+            writer.ToString();
+            return writer.SafeOutput;
         }
 
         public override string ToString()

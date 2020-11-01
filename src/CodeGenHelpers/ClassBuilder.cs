@@ -24,6 +24,16 @@ namespace CodeGenHelpers
 
         public string ClassName { get; }
 
+        public string FullyQualifiedName => $"{Builder.Namespace}.{ClassName}";
+
+        public IReadOnlyList<ConstructorBuilder> Constructors => _constructors;
+
+        public IReadOnlyList<PropertyBuilder> Properties => _properties;
+
+        public IReadOnlyList<MethodBuilder> Methods => _methods;
+
+        public IReadOnlyList<ClassBuilder> NestedClasses => _nestedClass.ToList();
+
         public CodeBuilder Builder { get; }
 
         public string BaseClass { get; private set; }
@@ -79,12 +89,14 @@ namespace CodeGenHelpers
 
         public ClassBuilder AddNamespaceImport(ISymbol symbol)
         {
-            return AddNamespaceImport(symbol.ContainingNamespace.ToString());
+            Builder.AddNamespaceImport(symbol);
+            return this;
         }
 
         public ClassBuilder AddNamespaceImport(INamespaceSymbol symbol)
         {
-            return AddNamespaceImport(symbol.ToString());
+            Builder.AddNamespaceImport(symbol);
+            return this;
         }
 
         public ClassBuilder AddInterface(string interfaceName)
@@ -100,7 +112,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder AddInterface(INamedTypeSymbol symbol)
+        public ClassBuilder AddInterface(ITypeSymbol symbol)
         {
             _interfaces.Add(symbol.Name);
             return AddNamespaceImport(symbol);
@@ -132,6 +144,12 @@ namespace CodeGenHelpers
         {
             var builder = new ConstructorBuilder(accessModifier, this);
             _constructors.Add(builder);
+            return builder;
+        }
+
+        public ConstructorBuilder AddConstructor(IMethodSymbol baseConstructor, Accessibility? accessModifier = null)
+        {
+            var builder = AddConstructor(accessModifier);
             return builder;
         }
 
