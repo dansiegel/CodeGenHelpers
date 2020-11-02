@@ -193,6 +193,10 @@ namespace CodeGenHelpers
             return this;
         }
 
+        public string Build() => Builder.Build();
+
+        public string BuildSafe() => Builder.BuildSafe();
+
         void IBuilder.Write(ref CodeWriter writer)
         {
             WriteClassAttributes(_classAttributes, ref writer);
