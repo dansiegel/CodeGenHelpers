@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -209,7 +209,7 @@ namespace CodeGenHelpers
                 queue.Enqueue(BaseClass);
             }
 
-            foreach (var inter in _interfaces.Distinct().OrderBy(x => x))
+            foreach (var inter in _interfaces.Where(x => !string.IsNullOrEmpty(x)).Distinct().OrderBy(x => x))
             {
                 queue.Enqueue(inter);
             }
