@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -191,6 +191,16 @@ namespace CodeGenHelpers
         {
             IsStatic = true;
             return this;
+        }
+
+        public ClassBuilder AddNestedClass(string name, Accessibility? accessModifier = null)
+        {
+            var builder = new ClassBuilder(name, Builder);
+            if (accessModifier.HasValue)
+                builder.WithAccessModifier(accessModifier.Value);
+
+            _nestedClass.Enqueue(builder);
+            return builder;
         }
 
         public string Build() => Builder.Build();
