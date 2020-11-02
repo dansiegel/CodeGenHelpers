@@ -19,7 +19,7 @@ namespace CodeGenHelpers
         {
             Name = name;
             AccessModifier = accessModifier;
-            Builder = builder;
+            Class = builder;
         }
 
         public string Name { get; }
@@ -28,7 +28,7 @@ namespace CodeGenHelpers
 
         public bool IsAsync { get; private set; }
 
-        public ClassBuilder Builder { get; }
+        public ClassBuilder Class { get; }
 
         public Accessibility? AccessModifier { get; private set; }
 
@@ -42,7 +42,7 @@ namespace CodeGenHelpers
 
         public MethodBuilder AddNamespaceImport(string importedNamespace)
         {
-            Builder.AddNamespaceImport(importedNamespace);
+            Class.AddNamespaceImport(importedNamespace);
             return this;
         }
 
@@ -58,7 +58,7 @@ namespace CodeGenHelpers
 
         public PropertyBuilder AddProperty(string name, Accessibility? accessModifier = null)
         {
-            return Builder.AddProperty(name, accessModifier);
+            return Class.AddProperty(name, accessModifier);
         }
 
         public MethodBuilder MakeAsync()
