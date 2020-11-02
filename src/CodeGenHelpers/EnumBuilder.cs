@@ -78,14 +78,21 @@ namespace CodeGenHelpers
                 writer.AppendLine($"[{attr}]");
             }
 
-            using (writer.Block($"{AccessModifier.Code()} enum {Name}"))
+            var parts = new[]
             {
-                while(queue.Any())
+                AccessModifier.Code(),
+                "enum",
+                Name
+            };
+
+            using (writer.Block(string.Join(" ", parts.Where(x => !string.IsNullOrEmpty(x)))))
+            {
+                while (queue.Any())
                 {
                     var value = queue.Dequeue();
                     value.Write(ref writer);
 
-                    if(queue.Any())
+                    if (queue.Any())
                     {
                         writer.AppendUnindentedLine(",");
                         writer.NewLine();
