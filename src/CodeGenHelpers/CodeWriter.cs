@@ -27,7 +27,7 @@ namespace CodeGenHelpers
 
         public IDisposable Block(string value, params string[] constraints)
         {
-            AppendLine(value);
+            AppendLine(value?.TrimEnd());
             _indentLevel++;
             foreach (var constraint in constraints)
             {
@@ -45,14 +45,14 @@ namespace CodeGenHelpers
 
         public void Append(string value, string safeValue = null)
         {
-            _outputCode.Append(GetIndentedValue(value.Trim()));
-            _safeCode.Append(GetIndentedValue(safeValue?.Trim() ?? value.Trim()));
+            _outputCode.Append(GetIndentedValue(value.TrimEnd()));
+            _safeCode.Append(GetIndentedValue(safeValue?.TrimEnd() ?? value.TrimEnd()));
         }
 
         public void AppendUnindented(string value, string safeValue = null)
         {
-            _outputCode.Append(value.Trim());
-            _safeCode.Append(safeValue?.Trim() ?? value.Trim());
+            _outputCode.Append(value.TrimEnd());
+            _safeCode.Append(safeValue?.TrimEnd() ?? value.TrimEnd());
         }
 
         public void NewLine()
@@ -63,14 +63,14 @@ namespace CodeGenHelpers
 
         public void AppendLine(string value, string safeValue = null)
         {
-            _outputCode.AppendLine(GetIndentedValue(value.Trim()));
-            _safeCode.AppendLine(GetIndentedValue(safeValue?.Trim() ?? value.Trim()));
+            _outputCode.AppendLine(GetIndentedValue(value.TrimEnd()));
+            _safeCode.AppendLine(GetIndentedValue(safeValue?.TrimEnd() ?? value.TrimEnd()));
         }
 
         public void AppendUnindentedLine(string value, string safeValue = null)
         {
-            _outputCode.AppendLine(value.Trim());
-            _safeCode.AppendLine(safeValue?.Trim() ?? value.Trim());
+            _outputCode.AppendLine(value.TrimEnd());
+            _safeCode.AppendLine(safeValue?.TrimEnd() ?? value.TrimEnd());
         }
 
         private string GetIndentedValue(string value)
