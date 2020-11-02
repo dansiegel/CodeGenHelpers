@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
@@ -16,11 +17,13 @@ namespace CodeGenHelpers
         private readonly List<MethodBuilder> _methods = new List<MethodBuilder>();
         private readonly Queue<ClassBuilder> _nestedClass = new Queue<ClassBuilder>();
         private readonly List<string> _constraints = new List<string>();
+        private readonly bool _isPartial;
 
-        internal ClassBuilder(string className, CodeBuilder codeBuilder)
+        internal ClassBuilder(string className, CodeBuilder codeBuilder, bool partial = true)
         {
             Name = className;
             Builder = codeBuilder;
+            _isPartial = partial;
         }
 
         public string Name { get; }
@@ -44,6 +47,14 @@ namespace CodeGenHelpers
         public TypeKind Kind { get; private set; } = TypeKind.Class;
 
         public bool IsStatic { get; private set; }
+
+        public bool IsSealed { get; private set; }
+
+        public ClassBuilder Sealed()
+        {
+            IsSealed = true;
+            return this;
+        }
 
         public ClassBuilder IsStruct()
         {
@@ -197,7 +208,7 @@ namespace CodeGenHelpers
 
         public ClassBuilder AddNestedClass(string name, Accessibility? accessModifier = null)
         {
-            var builder = new ClassBuilder(name, Builder);
+            var builder = new ClassBuilder(name, Builder, false);
             if (accessModifier.HasValue)
                 builder.WithAccessModifier(accessModifier.Value);
 
@@ -226,15 +237,24 @@ namespace CodeGenHelpers
                 queue.Enqueue(inter);
             }
 
-            var extra = queue.Any() ? $" : {string.Join(", ", queue)}" : string.Empty;
+            var extra = queue.Any() ? $": {string.Join(", ", queue)}" : string.Empty;
 
             foreach (var attr in _attributes)
             {
                 writer.AppendLine($"[{attr}]");
             }
 
-            var classDeclaration = $"{AccessModifier.Code()} {staticDeclaration}partial {Kind.ToString().ToLower()} {Name}{extra}";
-            using (writer.Block(classDeclaration, _constraints.ToArray()))
+            var classDeclaration = new[] {
+                AccessModifier.Code(),
+                IsStatic ? "static" : null,
+                IsSealed ? "sealed" : null,
+                _isPartial ? "partial" : null,
+                Kind.ToString().ToLower(),
+                Name,
+                extra
+            };
+
+            using (writer.Block(string.Join(" ", classDeclaration.Where(x => !string.IsNullOrEmpty(x))), _constraints.ToArray()))
             {
                 var hadOutput = false;
                 hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false), ref hadOutput, ref writer, true);
