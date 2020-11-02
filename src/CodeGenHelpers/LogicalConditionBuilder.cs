@@ -58,10 +58,10 @@ namespace CodeGenHelpers
             return builder;
         }
 
-        public ICodeWriter Flush()
+        public ICodeWriter EndIf()
         {
             if (_parent != null)
-                _parent.Flush();
+                _parent.EndIf();
             else
                 WriteInternal();
 
