@@ -13,6 +13,8 @@ namespace CodeGenHelpers
 
         private Action<ICodeWriter> _methodBodyWriter;
 
+        private string _baseCall;
+
         internal ConstructorBuilder(Accessibility? accessModifier, ClassBuilder classBuilder)
         {
             AccessModifier = accessModifier;
@@ -75,6 +77,34 @@ namespace CodeGenHelpers
             return this;
         }
 
+        public ConstructorBuilder WithThisCall(Dictionary<string, string> parameters)
+        {
+            _baseCall = $": this({string.Join(", ", parameters.Select(x => $"{x.Key} {x.Value}"))})";
+            return this;
+        }
+
+        public ConstructorBuilder WithThisCall(IMethodSymbol baseConstructor)
+        {
+            foreach (var symbol in baseConstructor.Parameters)
+                AddNamespaceImport(symbol);
+
+            return WithBaseCall(baseConstructor.Parameters.ToDictionary(x => x.Type.Name, x => x.Name));
+        }
+
+        public ConstructorBuilder WithBaseCall(Dictionary<string, string> parameters)
+        {
+            _baseCall = $": base({string.Join(", ", parameters.Select(x => $"{x.Key} {x.Value}"))})";
+            return this;
+        }
+
+        public ConstructorBuilder WithBaseCall(IMethodSymbol baseConstructor)
+        {
+            foreach (var symbol in baseConstructor.Parameters)
+                AddNamespaceImport(symbol);
+
+            return WithBaseCall(baseConstructor.Parameters.ToDictionary(x => x.Type.Name, x => x.Name));
+        }
+
         public ConstructorBuilder AddNamespaceImport(string namespaceImport)
         {
             ClassBuilder.AddNamespaceImport(namespaceImport);
@@ -107,7 +137,7 @@ namespace CodeGenHelpers
                 _ => AccessModifier.ToString().ToLower()
             };
             var parameters = _parameters.Any() ? string.Join(", ", _parameters.Select(x => $"{x.Value} {x.Key}")) : string.Empty;
-            using(writer.Block($"{modifier} {ClassBuilder.Name}({parameters})"))
+            using(writer.Block($"{modifier} {ClassBuilder.Name}({parameters})", _baseCall))
             {
                 _methodBodyWriter?.Invoke(writer);
             }

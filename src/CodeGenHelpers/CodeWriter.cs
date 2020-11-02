@@ -30,7 +30,12 @@ namespace CodeGenHelpers
             AppendLine(value);
             _indentLevel++;
             foreach (var constraint in constraints)
+            {
+                if (string.IsNullOrEmpty(constraint))
+                    continue;
+
                 AppendLine(constraint);
+            }
 
             _indentLevel--;
             AppendLine("{");
