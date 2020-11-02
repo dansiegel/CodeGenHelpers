@@ -41,6 +41,17 @@ namespace CodeGenHelpers
             return AddNamespaceImport(symbol);
         }
 
+        public ConstructorBuilder AddParameters(IEnumerable<IParameterSymbol> parameters)
+        {
+            if (parameters is null || !parameters.Any())
+                return this;
+
+            foreach (var parameter in parameters)
+                AddParameter(parameter.Type, parameter.Name);
+
+            return this;
+        }
+
         private string GetValidatedParameterName(string parameterName, string typeName)
         {
             if (string.IsNullOrEmpty(parameterName))

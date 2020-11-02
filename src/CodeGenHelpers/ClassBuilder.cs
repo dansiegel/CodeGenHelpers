@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -159,7 +159,9 @@ namespace CodeGenHelpers
 
         public ConstructorBuilder AddConstructor(IMethodSymbol baseConstructor, Accessibility? accessModifier = null)
         {
-            var builder = AddConstructor(accessModifier);
+            var builder = AddConstructor(accessModifier)
+                .AddParameters(baseConstructor.Parameters);
+            _constructors.Add(builder);
             return builder;
         }
 
