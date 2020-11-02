@@ -107,7 +107,7 @@ namespace CodeGenHelpers
                 _ => AccessModifier.ToString().ToLower()
             };
             var parameters = _parameters.Any() ? string.Join(", ", _parameters.Select(x => $"{x.Value} {x.Key}")) : string.Empty;
-            using(writer.Block($"{modifier} {ClassBuilder.ClassName}({parameters})"))
+            using(writer.Block($"{modifier} {ClassBuilder.Name}({parameters})"))
             {
                 _methodBodyWriter?.Invoke(writer);
             }

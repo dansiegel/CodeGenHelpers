@@ -8,6 +8,7 @@ namespace CodeGenHelpers
 {
     public sealed class ClassBuilder : IBuilder
     {
+        private readonly List<string> _attributes = new List<string>();
         private readonly List<string> _interfaces = new List<string>();
         private readonly List<string> _classAttributes = new List<string>();
         private readonly List<ConstructorBuilder> _constructors = new List<ConstructorBuilder>();
@@ -18,13 +19,13 @@ namespace CodeGenHelpers
 
         internal ClassBuilder(string className, CodeBuilder codeBuilder)
         {
-            ClassName = className;
+            Name = className;
             Builder = codeBuilder;
         }
 
-        public string ClassName { get; }
+        public string Name { get; }
 
-        public string FullyQualifiedName => $"{Builder.Namespace}.{ClassName}";
+        public string FullyQualifiedName => $"{Builder.Namespace}.{Name}";
 
         public IReadOnlyList<ConstructorBuilder> Constructors => _constructors;
 
@@ -78,6 +79,15 @@ namespace CodeGenHelpers
         public ClassBuilder AddConstraint(string constraint)
         {
             _constraints.Add(constraint);
+            return this;
+        }
+
+        public ClassBuilder AddAttribute(string attribute)
+        {
+            var sanitized = attribute.Replace("[", string.Empty).Replace("]", string.Empty);
+            if (!_attributes.Contains(sanitized))
+                _attributes.Add(sanitized);
+
             return this;
         }
 
@@ -194,6 +204,7 @@ namespace CodeGenHelpers
             {
                 queue.Enqueue(BaseClass);
             }
+
             foreach (var inter in _interfaces.Distinct().OrderBy(x => x))
             {
                 queue.Enqueue(inter);
@@ -201,7 +212,12 @@ namespace CodeGenHelpers
 
             var extra = queue.Any() ? $" : {string.Join(", ", queue)}" : string.Empty;
 
-            var classDeclaration = $"{AccessModifier.Code()} {staticDeclaration}partial {Kind.ToString().ToLower()} {ClassName}{extra}";
+            foreach (var attr in _attributes)
+            {
+                writer.AppendLine($"[{attr}]");
+            }
+
+            var classDeclaration = $"{AccessModifier.Code()} {staticDeclaration}partial {Kind.ToString().ToLower()} {Name}{extra}";
             using (writer.Block(classDeclaration, _constraints.ToArray()))
             {
                 var hadOutput = false;

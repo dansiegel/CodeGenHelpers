@@ -44,6 +44,12 @@ namespace CodeGenHelpers
             _safeCode.Append(GetIndentedValue(safeValue?.Trim() ?? value.Trim()));
         }
 
+        public void AppendUnindented(string value, string safeValue = null)
+        {
+            _outputCode.Append(value.Trim());
+            _safeCode.Append(safeValue?.Trim() ?? value.Trim());
+        }
+
         public void NewLine()
         {
             _outputCode.AppendLine();

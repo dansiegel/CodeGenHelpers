@@ -23,7 +23,9 @@ namespace CodeGenHelpers
 
         public IndentStyle IndentStyle { get; }
 
-        public IReadOnlyList<ClassBuilder> Classes => _classes.Cast<ClassBuilder>().ToList();
+        public IReadOnlyList<ClassBuilder> Classes => _classes.OfType<ClassBuilder>().ToList();
+
+        public IReadOnlyList<EnumBuilder> Enums => _classes.OfType<EnumBuilder>().ToList();
 
         public static CodeBuilder Create(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces) =>
             new CodeBuilder(clrNamespace, indentStyle);
@@ -70,6 +72,13 @@ namespace CodeGenHelpers
             return AddClass(symbol.Name);
         }
 
+        public EnumBuilder AddEnum(string name)
+        {
+            var builder = new EnumBuilder(name, this);
+            _classes.Enqueue(builder);
+            return builder;
+        }
+
         private CodeWriter BuildInternal()
         {
             var writer = new CodeWriter(IndentStyle);
@@ -83,10 +92,10 @@ namespace CodeGenHelpers
             WriteNamespace(namespaceAlias, ref writer);
             WriteNamespace(namespaces, ref writer);
 
-            writer.NewLine();
+            if(_namespaceImports.Count > 0)
+                writer.NewLine();
+
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
-
-
             using (writer.Block($"namespace {Namespace}"))
             {
                 while (_classes.Any())
