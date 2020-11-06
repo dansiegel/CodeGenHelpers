@@ -93,6 +93,12 @@ namespace CodeGenHelpers
             return this;
         }
 
+        public ClassBuilder AddAssemblyAttribute(string attribute)
+        {
+            Builder.AddAssemblyAttribute(attribute);
+            return this;
+        }
+
         public ClassBuilder AddAttribute(string attribute)
         {
             var sanitized = attribute.Replace("[", string.Empty).Replace("]", string.Empty);

@@ -59,6 +59,12 @@ namespace CodeGenHelpers
             return AddNamespaceImport(symbol.ToString());
         }
 
+        public CodeBuilder AddAssemblyAttribute(string attribute)
+        {
+            _assemblyAttributes.Add(attribute);
+            return this;
+        }
+
         public ClassBuilder AddClass(string name)
         {
             var builder = new ClassBuilder(name, this);
