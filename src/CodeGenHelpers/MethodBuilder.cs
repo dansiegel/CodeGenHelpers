@@ -28,6 +28,19 @@ namespace CodeGenHelpers
 
         public bool IsAsync { get; private set; }
 
+        public bool HasBody
+        {
+            get
+            {
+                if (_methodBodyWriter is null)
+                    return false;
+
+                var writer = new CodeWriter(IndentStyle.Spaces);
+                _methodBodyWriter(writer);
+                return !string.IsNullOrEmpty(writer.ToString());
+            }
+        }
+
         public ClassBuilder Class { get; }
 
         public Accessibility? AccessModifier { get; private set; }
