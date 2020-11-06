@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -9,7 +9,7 @@ namespace CodeGenHelpers
     {
         private readonly List<string> _attributes = new List<string>();
         private readonly List<string> _constraints = new List<string>();
-        private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
+        private readonly List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
         private bool _override;
         private bool _virtual;
 
@@ -121,7 +121,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public MethodBuilder AddParameter(string typeName, string parameterName = null)
+        public MethodBuilder AddParameter(string typeName, string parameterName = null, int index = -1)
         {
             if (string.IsNullOrEmpty(parameterName))
             {
@@ -136,11 +136,22 @@ namespace CodeGenHelpers
 
             int i = 1;
             var validatedName = parameterName;
-            while (_parameters.ContainsKey(validatedName))
+            while (_parameters.Any(x => x.Key == validatedName))
                 validatedName = $"{parameterName}{i++}";
 
-            _parameters.Add(validatedName, typeName);
+            var parameter = new KeyValuePair<string, string>(validatedName, typeName);
+            if (index < 0)
+                _parameters.Add(parameter);
+            else
+                _parameters.Insert(index, parameter);
+
             return this;
+        }
+
+        public MethodBuilder AddParameter(ITypeSymbol symbol, string parameterName = null, int index = -1)
+        {
+            return AddNamespaceImport(symbol)
+                .AddParameter(symbol.Name, parameterName, index);
         }
 
         public MethodBuilder WithBody(Action<ICodeWriter> writerDelegate)
