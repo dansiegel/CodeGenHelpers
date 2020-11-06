@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -81,9 +81,9 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public MethodBuilder Override()
+        public MethodBuilder Override(bool @override = true)
         {
-            _override = true;
+            _override = @override;
             return this;
         }
 
