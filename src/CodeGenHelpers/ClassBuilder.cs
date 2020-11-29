@@ -26,6 +26,8 @@ namespace CodeGenHelpers
             _isPartial = partial;
         }
 
+        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
+
         public string Name { get; }
 
         public string FullyQualifiedName => $"{Builder.Namespace}.{Name}";
@@ -49,6 +51,19 @@ namespace CodeGenHelpers
         public bool IsStatic { get; private set; }
 
         public bool IsSealed { get; private set; }
+
+        public ClassBuilder WithSummary(string summary)
+        {
+            XmlDoc.Summary = summary;
+            return this;
+        }
+
+        public ClassBuilder WithInheritDoc(bool inherit = true, string from = null)
+        {
+            XmlDoc.InheritDoc = inherit;
+            XmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public ClassBuilder Sealed()
         {
@@ -228,6 +243,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            XmlDoc.Write(ref writer);
+
             WriteClassAttributes(_classAttributes, ref writer);
 
             var staticDeclaration = IsStatic ? "static " : string.Empty;

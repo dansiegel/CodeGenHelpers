@@ -22,6 +22,8 @@ namespace CodeGenHelpers
             Class = builder;
         }
 
+        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
+
         public string Name { get; }
 
         public string ReturnType { get; private set; }
@@ -46,6 +48,28 @@ namespace CodeGenHelpers
         public Accessibility? AccessModifier { get; private set; }
 
         public bool IsStatic { get; private set; }
+
+        public MethodBuilder WithSummary(string summary)
+        {
+            XmlDoc.Summary = summary;
+            return this;
+        }
+
+        public MethodBuilder WithInheritDoc(bool inherit = true, string from = null)
+        {
+            XmlDoc.InheritDoc = inherit;
+            XmlDoc.InheritFrom = from;
+            return this;
+        }
+
+        public MethodBuilder WithParameterDoc(string paramName, string documentation)
+        {
+            // The reason why I don't check if the parameter exists,
+            // is that maybe the user wants to add the parameter later themselves
+            // and an extra xmldoc won't really cause issue.
+            XmlDoc.ParameterDoc[paramName] = documentation;
+            return this;
+        }
 
         public MethodBuilder AddConstraint(string constraint)
         {
@@ -181,6 +205,8 @@ namespace CodeGenHelpers
 
             var parameters = string.Join(", ", _parameters.Select(x => $"{x.Value} {x.Key}"));
             output = $"{AccessModifier.Code()} {output} {Name}({parameters})";
+
+            XmlDoc.Write(ref writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
