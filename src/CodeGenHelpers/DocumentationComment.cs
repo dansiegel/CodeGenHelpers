@@ -12,7 +12,7 @@ namespace CodeGenHelpers
 
         public string? InheritFrom { get; set; }
 
-        public void Write(ref CodeWriter writer)
+        internal void Write(ref CodeWriter writer)
         {
             if (InheritDoc)
             {
