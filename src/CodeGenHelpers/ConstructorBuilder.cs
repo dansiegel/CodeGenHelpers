@@ -21,11 +21,35 @@ namespace CodeGenHelpers
             Class = classBuilder;
         }
 
+        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
+
         public Accessibility? AccessModifier { get; }
 
         public ClassBuilder Class { get; }
 
         internal int Parameters => _parameters.Count;
+
+        public ConstructorBuilder WithSummary(string summary)
+        {
+            XmlDoc.Summary = summary;
+            return this;
+        }
+
+        public ConstructorBuilder WithInheritDoc(bool inherit = true, string from = null)
+        {
+            XmlDoc.InheritDoc = inherit;
+            XmlDoc.InheritFrom = from;
+            return this;
+        }
+
+        public ConstructorBuilder WithParameterDoc(string paramName, string documentation)
+        {
+            // The reason why I don't check if the parameter exists,
+            // is that maybe the user wants to add the parameter later themselves
+            // and an extra xmldoc won't really cause issue.
+            XmlDoc.ParameterDoc[paramName] = documentation;
+            return this;
+        }
 
         public ConstructorBuilder AddParameter(string typeName, string parameterName = null)
         {
@@ -181,6 +205,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            XmlDoc.Write(ref writer);
+
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
 

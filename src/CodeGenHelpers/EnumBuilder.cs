@@ -17,9 +17,24 @@ namespace CodeGenHelpers
 
         public CodeBuilder Builder { get; }
 
+        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
+
         public string Name { get; }
 
         public Accessibility? AccessModifier { get; private set; }
+
+        public EnumBuilder WithSummary(string summary)
+        {
+            XmlDoc.Summary = summary;
+            return this;
+        }
+
+        public EnumBuilder WithInheritDoc(bool inherit = true, string from = null)
+        {
+            XmlDoc.InheritDoc = inherit;
+            XmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public EnumValueBuilder AddValue(string name, int? numericValue = null)
         {
@@ -67,6 +82,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            XmlDoc.Write(ref writer);
+
             var queue = new Queue<IBuilder>();
             _values.OrderBy(x => x.Value)
                 .ThenBy(x => x.Name)

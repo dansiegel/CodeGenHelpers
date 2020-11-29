@@ -33,6 +33,8 @@ namespace CodeGenHelpers
             Class = builder;
         }
 
+        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
+
         public string Name { get; }
 
         public string Type { get; private set; }
@@ -42,6 +44,19 @@ namespace CodeGenHelpers
         public Accessibility? AccessModifier { get; private set; }
 
         public bool IsStatic { get; private set; }
+
+        public PropertyBuilder WithSummary(string summary)
+        {
+            XmlDoc.Summary = summary;
+            return this;
+        }
+
+        public PropertyBuilder WithInheritDoc(bool inherit = true, string from = null)
+        {
+            XmlDoc.InheritDoc = inherit;
+            XmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public PropertyBuilder AddNamespaceImport(string importedNamespace)
         {
@@ -176,6 +191,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            XmlDoc.Write(ref writer);
+
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
 

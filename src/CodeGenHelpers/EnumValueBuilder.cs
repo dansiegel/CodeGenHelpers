@@ -14,11 +14,26 @@ namespace CodeGenHelpers
             Enum = builder;
         }
 
+        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
+
         public string Name { get; }
 
         public int? Value { get; private set; }
 
         public EnumBuilder Enum { get; }
+
+        public EnumValueBuilder WithSummary(string summary)
+        {
+            XmlDoc.Summary = summary;
+            return this;
+        }
+
+        public EnumValueBuilder WithInheritDoc(bool inherit = true, string from = null)
+        {
+            XmlDoc.InheritDoc = inherit;
+            XmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public EnumValueBuilder AddValue(string value, int? numericValue = null)
         {
@@ -36,6 +51,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            XmlDoc.Write(ref writer);
+
             foreach (var attr in _attributes.OrderBy(x => x))
             {
                 writer.AppendLine($"[{attr}]");
