@@ -10,7 +10,7 @@ namespace CodeGenHelpers
     {
         private readonly List<string> _namespaceImports = new List<string>();
         private readonly List<string> _assemblyAttributes = new List<string>();
-        private readonly Queue<IBuilder> _classes = new Queue<IBuilder>();
+        private readonly List<IBuilder> _classes = new List<IBuilder>();
 
         private CodeBuilder(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces)
         {
@@ -68,7 +68,7 @@ namespace CodeGenHelpers
         public ClassBuilder AddClass(string name)
         {
             var builder = new ClassBuilder(name, this);
-            _classes.Enqueue(builder);
+            _classes.Add(builder);
             return builder;
         }
 
@@ -80,8 +80,15 @@ namespace CodeGenHelpers
         public EnumBuilder AddEnum(string name)
         {
             var builder = new EnumBuilder(name, this);
-            _classes.Enqueue(builder);
+            _classes.Add(builder);
             return builder;
+        }
+
+        public void Clear()
+        {
+            _namespaceImports.Clear();
+            _assemblyAttributes.Clear();
+            _classes.Clear();
         }
 
         private CodeWriter BuildInternal()
@@ -103,12 +110,12 @@ namespace CodeGenHelpers
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
             using (writer.Block($"namespace {Namespace}"))
             {
-                while (_classes.Any())
+                for (int i = 0; i < _classes.Count; i++)
                 {
-                    var output = _classes.Dequeue();
-                    output.Write(ref writer);
+                    var current = _classes[i];
+                    current.Write(ref writer);
 
-                    if (_classes.Any())
+                    if (i + 1 < _classes.Count)
                         writer.NewLine();
                 }
             }
