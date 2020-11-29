@@ -26,5 +26,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)LogicalConditionBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MethodBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DocumentationComment.cs" />
   </ItemGroup>
 </Project>
