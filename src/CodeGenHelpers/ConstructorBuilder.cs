@@ -9,7 +9,7 @@ namespace CodeGenHelpers
     {
         private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
         private readonly List<string> _attributes = new List<string>();
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
 
         private Action<ICodeWriter> _methodBodyWriter;
 

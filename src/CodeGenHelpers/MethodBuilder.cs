@@ -10,7 +10,7 @@ namespace CodeGenHelpers
         private readonly List<string> _attributes = new List<string>();
         private readonly List<string> _constraints = new List<string>();
         private readonly List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
         private bool _override;
         private bool _virtual;
 

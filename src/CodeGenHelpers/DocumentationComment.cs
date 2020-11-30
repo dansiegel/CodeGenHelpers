@@ -6,9 +6,16 @@ namespace CodeGenHelpers
 {
     internal class DocumentationComment
     {
+        internal DocumentationComment(bool supportsParameterDoc = false)
+        {
+            ParameterDoc = supportsParameterDoc
+                ? new Dictionary<string, string>()
+                : null;
+        }
+
         internal string? Summary { get; set; }
 
-        internal Dictionary<string, string> ParameterDoc { get; } = new Dictionary<string, string>();
+        internal Dictionary<string, string>? ParameterDoc { get; }
 
         internal bool InheritDoc { get; set; }
 
@@ -33,8 +40,11 @@ namespace CodeGenHelpers
                 writer.AppendLine("/// </summary>");
             }
 
-            foreach (var param in ParameterDoc)
-                writer.AppendLine($"/// <param name=\"{param.Key}\">{param.Value}</param>");
+            if (ParameterDoc is {})
+            {
+                foreach (var param in ParameterDoc)
+                    writer.AppendLine($"/// <param name=\"{param.Key}\">{param.Value}</param>");
+            }
         }
 
         internal void RemoveUnusedParameters(Dictionary<string, string> parameters)
