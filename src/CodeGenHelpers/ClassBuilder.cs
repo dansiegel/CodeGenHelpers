@@ -54,12 +54,20 @@ namespace CodeGenHelpers
         public ClassBuilder WithSummary(string summary)
         {
             _xmlDoc.Summary = summary;
+            _xmlDoc.InheritDoc = false;
             return this;
         }
 
-        public ClassBuilder WithInheritDoc(bool inherit = true, string from = null)
+        public ClassBuilder WithInheritDoc(bool inherit = true)
         {
             _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = null;
+            return this;
+        }
+
+        public ClassBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc.InheritDoc = true;
             _xmlDoc.InheritFrom = from;
             return this;
         }
