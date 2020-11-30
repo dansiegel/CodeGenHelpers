@@ -1,22 +1,24 @@
+using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace CodeGenHelpers
 {
-    public class DocumentationComment
+    internal class DocumentationComment
     {
-        public string? Summary { get; set; }
+        internal string? Summary { get; set; }
 
-        public Dictionary<string, string> ParameterDoc { get; } = new Dictionary<string, string>();
+        internal Dictionary<string, string> ParameterDoc { get; } = new Dictionary<string, string>();
 
-        public bool InheritDoc { get; set; }
+        internal bool InheritDoc { get; set; }
 
-        public string? InheritFrom { get; set; }
+        internal string? InheritFrom { get; set; }
 
         internal void Write(ref CodeWriter writer)
         {
             if (InheritDoc)
             {
-                writer.AppendLine($"/// <inheritdoc {(InheritFrom is null ? "" : $"cref=\"{InheritFrom}\"")}/>");
+                writer.AppendLine($"/// <inheritdoc {(InheritFrom is null ? string.Empty : $"cref=\"{InheritFrom}\"")}/>");
                 return;
             }
 
@@ -24,7 +26,8 @@ namespace CodeGenHelpers
             {
                 writer.AppendLine("/// <summary>");
 
-                foreach (string line in Summary.Split('\n'))
+                string[] lines = Summary.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                foreach (string line in lines)
                     writer.AppendLine($"/// {line}");
 
                 writer.AppendLine("/// </summary>");
@@ -32,6 +35,13 @@ namespace CodeGenHelpers
 
             foreach (var param in ParameterDoc)
                 writer.AppendLine($"/// <param name=\"{param.Key}\">{param.Value}</param>");
+        }
+
+        internal void RemoveUnusedParameters(Dictionary<string, string> parameters)
+        {
+            var unusedParameters = ParameterDoc.Where(p => !parameters.ContainsKey(p.Key)).ToArray();
+            foreach ((var name, var _) in unusedParameters)
+                ParameterDoc.Remove(name);
         }
     }
 }

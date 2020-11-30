@@ -18,6 +18,7 @@ namespace CodeGenHelpers
         private readonly Queue<ClassBuilder> _nestedClass = new Queue<ClassBuilder>();
         private readonly List<string> _constraints = new List<string>();
         private readonly bool _isPartial;
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
         internal ClassBuilder(string className, CodeBuilder codeBuilder, bool partial = true)
         {
@@ -25,8 +26,6 @@ namespace CodeGenHelpers
             Builder = codeBuilder;
             _isPartial = partial;
         }
-
-        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
 
         public string Name { get; }
 
@@ -54,14 +53,14 @@ namespace CodeGenHelpers
 
         public ClassBuilder WithSummary(string summary)
         {
-            XmlDoc.Summary = summary;
+            _xmlDoc.Summary = summary;
             return this;
         }
 
         public ClassBuilder WithInheritDoc(bool inherit = true, string from = null)
         {
-            XmlDoc.InheritDoc = inherit;
-            XmlDoc.InheritFrom = from;
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = from;
             return this;
         }
 
@@ -243,7 +242,7 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
-            XmlDoc.Write(ref writer);
+            _xmlDoc.Write(ref writer);
 
             WriteClassAttributes(_classAttributes, ref writer);
 

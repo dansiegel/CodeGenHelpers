@@ -10,6 +10,7 @@ namespace CodeGenHelpers
         private readonly List<string> _attributes = new List<string>();
         private readonly List<string> _constraints = new List<string>();
         private readonly List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
         private bool _override;
         private bool _virtual;
 
@@ -21,8 +22,6 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             Class = builder;
         }
-
-        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
 
         public string Name { get; }
 
@@ -51,23 +50,20 @@ namespace CodeGenHelpers
 
         public MethodBuilder WithSummary(string summary)
         {
-            XmlDoc.Summary = summary;
+            _xmlDoc.Summary = summary;
             return this;
         }
 
         public MethodBuilder WithInheritDoc(bool inherit = true, string from = null)
         {
-            XmlDoc.InheritDoc = inherit;
-            XmlDoc.InheritFrom = from;
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = from;
             return this;
         }
 
         public MethodBuilder WithParameterDoc(string paramName, string documentation)
         {
-            // The reason why I don't check if the parameter exists,
-            // is that maybe the user wants to add the parameter later themselves
-            // and an extra xmldoc won't really cause issue.
-            XmlDoc.ParameterDoc[paramName] = documentation;
+            _xmlDoc.ParameterDoc[paramName] = documentation;
             return this;
         }
 
@@ -206,7 +202,8 @@ namespace CodeGenHelpers
             var parameters = string.Join(", ", _parameters.Select(x => $"{x.Value} {x.Key}"));
             output = $"{AccessModifier.Code()} {output} {Name}({parameters})";
 
-            XmlDoc.Write(ref writer);
+            _xmlDoc.RemoveUnusedParameters(_parameters.ToDictionary(p => p.Key, p => p.Value));
+            _xmlDoc.Write(ref writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");

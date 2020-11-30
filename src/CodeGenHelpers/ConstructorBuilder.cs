@@ -8,8 +8,8 @@ namespace CodeGenHelpers
     public sealed class ConstructorBuilder : IBuilder
     {
         private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
-
         private readonly List<string> _attributes = new List<string>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
         private Action<ICodeWriter> _methodBodyWriter;
 
@@ -21,8 +21,6 @@ namespace CodeGenHelpers
             Class = classBuilder;
         }
 
-        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
-
         public Accessibility? AccessModifier { get; }
 
         public ClassBuilder Class { get; }
@@ -31,23 +29,20 @@ namespace CodeGenHelpers
 
         public ConstructorBuilder WithSummary(string summary)
         {
-            XmlDoc.Summary = summary;
+            _xmlDoc.Summary = summary;
             return this;
         }
 
         public ConstructorBuilder WithInheritDoc(bool inherit = true, string from = null)
         {
-            XmlDoc.InheritDoc = inherit;
-            XmlDoc.InheritFrom = from;
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = from;
             return this;
         }
 
         public ConstructorBuilder WithParameterDoc(string paramName, string documentation)
         {
-            // The reason why I don't check if the parameter exists,
-            // is that maybe the user wants to add the parameter later themselves
-            // and an extra xmldoc won't really cause issue.
-            XmlDoc.ParameterDoc[paramName] = documentation;
+            _xmlDoc.ParameterDoc[paramName] = documentation;
             return this;
         }
 
@@ -205,7 +200,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
-            XmlDoc.Write(ref writer);
+            _xmlDoc.RemoveUnusedParameters(_parameters);
+            _xmlDoc.Write(ref writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");

@@ -25,6 +25,7 @@ namespace CodeGenHelpers
         private bool _getOnly;
         private Accessibility? _setterAccessibility;
         private readonly List<string> _attributes = new List<string>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
         internal PropertyBuilder(string name, Accessibility? accessModifier, ClassBuilder builder)
         {
@@ -32,8 +33,6 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             Class = builder;
         }
-
-        public DocumentationComment XmlDoc { get; } = new DocumentationComment();
 
         public string Name { get; }
 
@@ -47,14 +46,14 @@ namespace CodeGenHelpers
 
         public PropertyBuilder WithSummary(string summary)
         {
-            XmlDoc.Summary = summary;
+            _xmlDoc.Summary = summary;
             return this;
         }
 
         public PropertyBuilder WithInheritDoc(bool inherit = true, string from = null)
         {
-            XmlDoc.InheritDoc = inherit;
-            XmlDoc.InheritFrom = from;
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = from;
             return this;
         }
 
@@ -191,7 +190,7 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
-            XmlDoc.Write(ref writer);
+            _xmlDoc.Write(ref writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
