@@ -6,6 +6,7 @@ namespace CodeGenHelpers
     public class EnumValueBuilder : IBuilder
     {
         private readonly List<string> _attributes = new List<string>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
         internal EnumValueBuilder(string name, EnumBuilder builder, int? value)
         {
@@ -19,6 +20,27 @@ namespace CodeGenHelpers
         public int? Value { get; private set; }
 
         public EnumBuilder Enum { get; }
+
+        public EnumValueBuilder WithSummary(string summary)
+        {
+            _xmlDoc.Summary = summary;
+            _xmlDoc.InheritDoc = false;
+            return this;
+        }
+
+        public EnumValueBuilder WithInheritDoc(bool inherit = true)
+        {
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = null;
+            return this;
+        }
+
+        public EnumValueBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc.InheritDoc = true;
+            _xmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public EnumValueBuilder AddValue(string value, int? numericValue = null)
         {
@@ -36,6 +58,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            _xmlDoc.Write(ref writer);
+
             foreach (var attr in _attributes.OrderBy(x => x))
             {
                 writer.AppendLine($"[{attr}]");

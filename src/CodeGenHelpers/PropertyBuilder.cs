@@ -25,6 +25,7 @@ namespace CodeGenHelpers
         private bool _getOnly;
         private Accessibility? _setterAccessibility;
         private readonly List<string> _attributes = new List<string>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
         internal PropertyBuilder(string name, Accessibility? accessModifier, ClassBuilder builder)
         {
@@ -42,6 +43,27 @@ namespace CodeGenHelpers
         public Accessibility? AccessModifier { get; private set; }
 
         public bool IsStatic { get; private set; }
+
+        public PropertyBuilder WithSummary(string summary)
+        {
+            _xmlDoc.Summary = summary;
+            _xmlDoc.InheritDoc = false;
+            return this;
+        }
+
+        public PropertyBuilder WithInheritDoc(bool inherit = true)
+        {
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = null;
+            return this;
+        }
+
+        public PropertyBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc.InheritDoc = true;
+            _xmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public PropertyBuilder AddNamespaceImport(string importedNamespace)
         {
@@ -176,6 +198,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            _xmlDoc.Write(ref writer);
+
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
 

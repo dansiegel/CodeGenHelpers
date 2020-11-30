@@ -8,8 +8,8 @@ namespace CodeGenHelpers
     public sealed class ConstructorBuilder : IBuilder
     {
         private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
-
         private readonly List<string> _attributes = new List<string>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
 
         private Action<ICodeWriter> _methodBodyWriter;
 
@@ -26,6 +26,33 @@ namespace CodeGenHelpers
         public ClassBuilder Class { get; }
 
         internal int Parameters => _parameters.Count;
+
+        public ConstructorBuilder WithSummary(string summary)
+        {
+            _xmlDoc.Summary = summary;
+            _xmlDoc.InheritDoc = false;
+            return this;
+        }
+
+        public ConstructorBuilder WithInheritDoc(bool inherit = true)
+        {
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = null;
+            return this;
+        }
+
+        public ConstructorBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc.InheritDoc = true;
+            _xmlDoc.InheritFrom = from;
+            return this;
+        }
+
+        public ConstructorBuilder WithParameterDoc(string paramName, string documentation)
+        {
+            _xmlDoc.ParameterDoc[paramName] = documentation;
+            return this;
+        }
 
         public ConstructorBuilder AddParameter(string typeName, string parameterName = null)
         {
@@ -181,6 +208,9 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            _xmlDoc.RemoveUnusedParameters(_parameters);
+            _xmlDoc.Write(ref writer);
+
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
 

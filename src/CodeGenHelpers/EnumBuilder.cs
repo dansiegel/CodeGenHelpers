@@ -8,6 +8,7 @@ namespace CodeGenHelpers
     {
         private readonly List<string> _attributes = new List<string>();
         private readonly List<EnumValueBuilder> _values = new List<EnumValueBuilder>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
         internal EnumBuilder(string name, CodeBuilder builder)
         {
@@ -20,6 +21,27 @@ namespace CodeGenHelpers
         public string Name { get; }
 
         public Accessibility? AccessModifier { get; private set; }
+
+        public EnumBuilder WithSummary(string summary)
+        {
+            _xmlDoc.Summary = summary;
+            _xmlDoc.InheritDoc = false;
+            return this;
+        }
+
+        public EnumBuilder WithInheritDoc(bool inherit = true)
+        {
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = null;
+            return this;
+        }
+
+        public EnumBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc.InheritDoc = true;
+            _xmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public EnumValueBuilder AddValue(string name, int? numericValue = null)
         {
@@ -67,6 +89,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            _xmlDoc.Write(ref writer);
+
             var queue = new Queue<IBuilder>();
             _values.OrderBy(x => x.Value)
                 .ThenBy(x => x.Name)

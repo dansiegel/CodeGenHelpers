@@ -84,6 +84,13 @@ namespace CodeGenHelpers
             return builder;
         }
 
+        public void Clear()
+        {
+            _namespaceImports.Clear();
+            _assemblyAttributes.Clear();
+            _classes.Clear();
+        }
+
         private CodeWriter BuildInternal()
         {
             var writer = new CodeWriter(IndentStyle);
@@ -103,12 +110,14 @@ namespace CodeGenHelpers
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
             using (writer.Block($"namespace {Namespace}"))
             {
-                while (_classes.Any())
+                var clone = new Queue<IBuilder>(_classes);
+
+                while (clone.Any())
                 {
-                    var output = _classes.Dequeue();
+                    var output = clone.Dequeue();
                     output.Write(ref writer);
 
-                    if (_classes.Any())
+                    if (clone.Any())
                         writer.NewLine();
                 }
             }

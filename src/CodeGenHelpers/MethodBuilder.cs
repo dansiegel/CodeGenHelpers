@@ -10,6 +10,7 @@ namespace CodeGenHelpers
         private readonly List<string> _attributes = new List<string>();
         private readonly List<string> _constraints = new List<string>();
         private readonly List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
         private bool _override;
         private bool _virtual;
 
@@ -46,6 +47,33 @@ namespace CodeGenHelpers
         public Accessibility? AccessModifier { get; private set; }
 
         public bool IsStatic { get; private set; }
+
+        public MethodBuilder WithSummary(string summary)
+        {
+            _xmlDoc.Summary = summary;
+            _xmlDoc.InheritDoc = false;
+            return this;
+        }
+
+        public MethodBuilder WithInheritDoc(bool inherit = true)
+        {
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = null;
+            return this;
+        }
+
+        public MethodBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc.InheritDoc = true;
+            _xmlDoc.InheritFrom = from;
+            return this;
+        }
+
+        public MethodBuilder WithParameterDoc(string paramName, string documentation)
+        {
+            _xmlDoc.ParameterDoc[paramName] = documentation;
+            return this;
+        }
 
         public MethodBuilder AddConstraint(string constraint)
         {
@@ -181,6 +209,9 @@ namespace CodeGenHelpers
 
             var parameters = string.Join(", ", _parameters.Select(x => $"{x.Value} {x.Key}"));
             output = $"{AccessModifier.Code()} {output} {Name}({parameters})";
+
+            _xmlDoc.RemoveUnusedParameters(_parameters.ToDictionary(p => p.Key, p => p.Value));
+            _xmlDoc.Write(ref writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");

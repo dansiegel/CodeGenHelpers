@@ -18,6 +18,7 @@ namespace CodeGenHelpers
         private readonly Queue<ClassBuilder> _nestedClass = new Queue<ClassBuilder>();
         private readonly List<string> _constraints = new List<string>();
         private readonly bool _isPartial;
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
         internal ClassBuilder(string className, CodeBuilder codeBuilder, bool partial = true)
         {
@@ -49,6 +50,27 @@ namespace CodeGenHelpers
         public bool IsStatic { get; private set; }
 
         public bool IsSealed { get; private set; }
+
+        public ClassBuilder WithSummary(string summary)
+        {
+            _xmlDoc.Summary = summary;
+            _xmlDoc.InheritDoc = false;
+            return this;
+        }
+
+        public ClassBuilder WithInheritDoc(bool inherit = true)
+        {
+            _xmlDoc.InheritDoc = inherit;
+            _xmlDoc.InheritFrom = null;
+            return this;
+        }
+
+        public ClassBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc.InheritDoc = true;
+            _xmlDoc.InheritFrom = from;
+            return this;
+        }
 
         public ClassBuilder Sealed()
         {
@@ -228,6 +250,8 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(ref CodeWriter writer)
         {
+            _xmlDoc.Write(ref writer);
+
             WriteClassAttributes(_classAttributes, ref writer);
 
             var staticDeclaration = IsStatic ? "static " : string.Empty;
