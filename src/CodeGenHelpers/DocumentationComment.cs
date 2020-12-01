@@ -50,8 +50,8 @@ namespace CodeGenHelpers
         internal void RemoveUnusedParameters(Dictionary<string, string> parameters)
         {
             var unusedParameters = ParameterDoc.Where(p => !parameters.ContainsKey(p.Key)).ToArray();
-            foreach ((var name, var _) in unusedParameters)
-                ParameterDoc.Remove(name);
+            foreach (var parameter in unusedParameters)
+                ParameterDoc.Remove(parameter.Key);
         }
     }
 }
