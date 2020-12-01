@@ -115,19 +115,9 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ConstructorBuilder WithThisCall(Dictionary<string, string> parameters)
+        public ConstructorBuilder WithThisCall(params string[] parameters)
         {
-            _baseCall = () =>
-            {
-                foreach (var param in parameters)
-                {
-                    if (!_parameters.ContainsKey(param.Key))
-                        _parameters.Add(param.Key, param.Value);
-                }
-
-                var output = _parameters.Where(x => parameters.ContainsKey(x.Key)).Select(x => x.Value);
-                return $": this({string.Join(", ", output)})";
-            };
+            _baseCall = () => $": this({string.Join(", ", parameters)})";
             return this;
         }
 
@@ -144,25 +134,15 @@ namespace CodeGenHelpers
                         _parameters.Add(param.Type.Name, param.Name);
                 }
 
-                var output = _parameters.Where(x => baseConstructor.Parameters.Any(p => p.Type.Name == x.Key || p.Type.GetFullMetadataName() == x.Key)).Select(x => x.Value);
+                var output = _parameters.Where(x => baseConstructor.Parameters.Any(p => p.Type.Name == x.Key || p.Type.GetFullMetadataName() == x.Key)).Select(x => x.Key);
                 return $": this({string.Join(", ", output)})";
             };
             return this;
         }
 
-        public ConstructorBuilder WithBaseCall(Dictionary<string, string> parameters)
+        public ConstructorBuilder WithBaseCall(params string[] parameters)
         {
-            _baseCall = () =>
-            {
-                foreach (var param in parameters)
-                {
-                    if (!_parameters.ContainsKey(param.Key))
-                        _parameters.Add(param.Key, param.Value);
-                }
-
-                var output = _parameters.Where(x => parameters.ContainsKey(x.Key)).Select(x => x.Value);
-                return $": base({string.Join(", ", output)})";
-            };
+            _baseCall = () => $": base({string.Join(", ", parameters)})";
             return this;
         }
 
@@ -179,7 +159,7 @@ namespace CodeGenHelpers
                         _parameters.Add(param.Type.Name, param.Name);
                 }
 
-                var output = _parameters.Where(x => baseConstructor.Parameters.Any(p => p.Type.Name == x.Key || p.Type.GetFullMetadataName() == x.Key)).Select(x => x.Value);
+                var output = _parameters.Where(x => baseConstructor.Parameters.Any(p => p.Type.Name == x.Key || p.Type.GetFullMetadataName() == x.Key)).Select(x => x.Key);
                 return $": base({string.Join(", ", output)})";
             };
             return this;
