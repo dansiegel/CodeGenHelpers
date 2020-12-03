@@ -20,6 +20,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)EntityType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumValueBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExpressionBlockBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ISymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBuilder.cs" />
