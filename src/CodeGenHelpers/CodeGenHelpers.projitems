@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -27,8 +27,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)ICodeWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICodeWriterExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IndentStyle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IParameterized.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LogicalConditionBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MethodBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterizedExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SwitchBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SwitchCaseBuilder.cs" />
