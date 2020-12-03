@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AccessibilityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BuilderBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BuilderBase{T}.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClassBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeWriter.cs" />
