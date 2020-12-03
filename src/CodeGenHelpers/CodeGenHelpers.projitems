@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstructorBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DocumentationComment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EntityType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumValueBuilder.cs" />
@@ -26,6 +27,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)LogicalConditionBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MethodBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DocumentationComment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SwitchBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SwitchCaseBuilder.cs" />
   </ItemGroup>
 </Project>
