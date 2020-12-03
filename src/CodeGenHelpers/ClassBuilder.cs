@@ -1,18 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers
 {
-    public sealed class ClassBuilder : IBuilder
+    public sealed class ClassBuilder : BuilderBase<ClassBuilder>
     {
         private readonly List<string> _attributes = new List<string>();
         private readonly List<string> _interfaces = new List<string>();
         private readonly List<string> _classAttributes = new List<string>();
         private readonly List<ConstructorBuilder> _constructors = new List<ConstructorBuilder>();
+        private readonly List<EventBuilder> _events = new List<EventBuilder>();
         private readonly List<PropertyBuilder> _properties = new List<PropertyBuilder>();
         private readonly List<MethodBuilder> _methods = new List<MethodBuilder>();
         private readonly Queue<ClassBuilder> _nestedClass = new Queue<ClassBuilder>();
@@ -115,7 +115,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder AddAssemblyAttribute(string attribute)
+        public override ClassBuilder AddAssemblyAttribute(string attribute)
         {
             Builder.AddAssemblyAttribute(attribute);
             return this;
@@ -130,19 +130,19 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder AddNamespaceImport(string importedNamespace)
+        public override ClassBuilder AddNamespaceImport(string importedNamespace)
         {
             Builder.AddNamespaceImport(importedNamespace);
             return this;
         }
 
-        public ClassBuilder AddNamespaceImport(ISymbol symbol)
+        public override ClassBuilder AddNamespaceImport(ISymbol symbol)
         {
             Builder.AddNamespaceImport(symbol);
             return this;
         }
 
-        public ClassBuilder AddNamespaceImport(INamespaceSymbol symbol)
+        public override ClassBuilder AddNamespaceImport(INamespaceSymbol symbol)
         {
             Builder.AddNamespaceImport(symbol);
             return this;
@@ -218,6 +218,13 @@ namespace CodeGenHelpers
             return builder;
         }
 
+        public EventBuilder AddEvent(string eventName)
+        {
+            var builder = new EventBuilder(this, eventName);
+            _events.Add(builder);
+            return builder;
+        }
+
         public ClassBuilder MakePublicClass() => WithAccessModifier(Accessibility.Public);
 
         public ClassBuilder MakeInternalClass() => WithAccessModifier(Accessibility.Internal);
@@ -248,7 +255,7 @@ namespace CodeGenHelpers
 
         public string BuildSafe() => Builder.BuildSafe();
 
-        void IBuilder.Write(ref CodeWriter writer)
+        internal override void Write(ref CodeWriter writer)
         {
             _xmlDoc.Write(ref writer);
 
@@ -287,6 +294,7 @@ namespace CodeGenHelpers
             using (writer.Block(string.Join(" ", classDeclaration.Where(x => !string.IsNullOrEmpty(x))), _constraints.ToArray()))
             {
                 var hadOutput = false;
+                hadOutput = InvokeBuilderWrite(_events, ref hadOutput, ref writer);
                 hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false), ref hadOutput, ref writer, true);
                 hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == true), ref hadOutput, ref writer, true);
                 hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.ReadOnly), ref hadOutput, ref writer, true);

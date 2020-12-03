@@ -10,22 +10,30 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AccessibilityExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BuilderBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)BuilderBase{T}.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClassBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstructorBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DocumentationComment.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EntityType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)EnumValueBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)EventBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ExpressionBlockBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ISymbolExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICodeWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ICodeWriterExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IndentStyle.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IParameterized.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LogicalConditionBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MethodBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ParameterizedExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PropertyBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DocumentationComment.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SwitchBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SwitchCaseBuilder.cs" />
   </ItemGroup>
 </Project>

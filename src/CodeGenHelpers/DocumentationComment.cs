@@ -47,9 +47,10 @@ namespace CodeGenHelpers
             }
         }
 
-        internal void RemoveUnusedParameters(Dictionary<string, string> parameters)
+        internal void RemoveUnusedParameters<T>(List<ParameterBuilder<T>> parameters)
+            where T : BuilderBase<T>, IParameterized<T>
         {
-            var unusedParameters = ParameterDoc.Where(p => !parameters.ContainsKey(p.Key)).ToArray();
+            var unusedParameters = ParameterDoc.Where(p => !parameters.Any(x => x.Type == p.Key)).ToArray();
             foreach (var parameter in unusedParameters)
                 ParameterDoc.Remove(parameter.Key);
         }

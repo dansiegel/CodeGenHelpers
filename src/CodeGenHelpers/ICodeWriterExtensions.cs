@@ -26,6 +26,16 @@ namespace CodeGenHelpers
             return new ExpressionBlockBuilder(writer, $"foreach ({parameter} in {collection})");
         }
 
+        public static SwitchBuilder Switch(this ICodeWriter writer, string switchOn)
+        {
+            return new SwitchBuilder(writer, switchOn, false);
+        }
+
+        //public static SwitchBuilder SwitchExpression(this ICodeWriter writer, string switchOn)
+        //{
+        //    return new SwitchBuilder(writer, switchOn, true);
+        //}
+
         public static ICodeWriter AppendLines<T>(this ICodeWriter writer, IEnumerable<T> collection, Func<T, string> predicate)
         {
             foreach (var value in collection)
