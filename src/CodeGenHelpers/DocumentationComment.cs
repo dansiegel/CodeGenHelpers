@@ -13,13 +13,13 @@ namespace CodeGenHelpers
                 : null;
         }
 
-        internal string? Summary { get; set; }
+        internal string Summary { get; set; }
 
-        internal Dictionary<string, string>? ParameterDoc { get; }
+        internal Dictionary<string, string> ParameterDoc { get; }
 
         internal bool InheritDoc { get; set; }
 
-        internal string? InheritFrom { get; set; }
+        internal string InheritFrom { get; set; }
 
         internal void Write(ref CodeWriter writer)
         {
