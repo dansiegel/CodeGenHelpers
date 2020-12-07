@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)BuilderBase{T}.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClassBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CodeBuilderExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CodeWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConstructorBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DocumentationComment.cs" />
