@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
@@ -90,8 +90,16 @@ namespace CodeGenHelpers
         public PropertyBuilder SetType(INamedTypeSymbol symbol)
         {
             return AddNamespaceImport(symbol.ContainingNamespace)
-                .SetType(symbol.Name);
+                .SetType(symbol.GetTypeName());
         }
+
+        public PropertyBuilder SetType(Type type)
+        {
+            return AddNamespaceImport(type.Namespace)
+                .SetType(type.GetTypeName());
+        }
+
+        public PropertyBuilder SetType<T>() => SetType(typeof(T));
 
         public PropertyBuilder MakePublicProperty() => WithAccessModifier(Accessibility.Public);
 
