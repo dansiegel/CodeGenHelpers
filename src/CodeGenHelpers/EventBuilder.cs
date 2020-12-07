@@ -69,7 +69,7 @@ namespace CodeGenHelpers
 
         public EventBuilder WithRemoveExpression(string addDelegateExpression)
         {
-            _addHandlerDelegate = w => w.AppendLine($"remove => {addDelegateExpression};");
+            _removeHandlerDelegate = w => w.AppendLine($"remove => {addDelegateExpression};");
             return this;
         }
 
