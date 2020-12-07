@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
@@ -185,6 +185,9 @@ namespace CodeGenHelpers
             return Class;
         }
 
+        public ClassBuilder MakeBackingField(string defaultValue = null, string safeValue = null) =>
+            WithValue(defaultValue, safeValue);
+
         public PropertyBuilder WithBackingField(string defaultValue = null, Accessibility? accessModifier = null)
         {
             var name = $"_{char.ToLower(Name[0])}{Name.Substring(1)}";
@@ -250,6 +253,13 @@ namespace CodeGenHelpers
                 _setter is null)
             {
                 writer.AppendLine($"{output} => {_getterExpression};");
+                return;
+            }
+
+            if(string.IsNullOrEmpty(_getterExpression) && string.IsNullOrEmpty(_setterExpression) &&
+                _getter is null && _setter is null)
+            {
+                writer.AppendLine($"{output};");
                 return;
             }
 
