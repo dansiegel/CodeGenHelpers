@@ -114,7 +114,7 @@ namespace CodeGenHelpers
         private static T AddParameterInternal<T>(this IParameterized<T> parameterized, ParameterBuilder<T> parameter, int index)
             where T : BuilderBase<T>, IParameterized<T>
         {
-            if (parameterized.Parameters.Any(p => p == parameter))
+            if (parameterized.Parameters.Any(p => p.Type == parameter.Type && p.Name == parameter.Name))
                 return parameterized.Parent;
 
             if (index > -1)

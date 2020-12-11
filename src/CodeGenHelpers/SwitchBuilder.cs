@@ -13,6 +13,8 @@ namespace CodeGenHelpers
         internal SwitchBuilder(ICodeWriter writer, string switchOn, bool expression)
         {
             _writer = writer;
+            _switchOn = switchOn;
+            Expression = expression;
         }
 
         public SwitchCaseBuilder AddCase(string @case)
