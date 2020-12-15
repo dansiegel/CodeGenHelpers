@@ -90,8 +90,16 @@ namespace CodeGenHelpers
         public PropertyBuilder SetType(INamedTypeSymbol symbol)
         {
             return AddNamespaceImport(symbol.ContainingNamespace)
-                .SetType(symbol.Name);
+                .SetType(symbol.GetTypeName());
         }
+
+        public PropertyBuilder SetType(Type type)
+        {
+            return AddNamespaceImport(type.Namespace)
+                .SetType(type.GetTypeName());
+        }
+
+        public PropertyBuilder SetType<T>() => SetType(typeof(T));
 
         public PropertyBuilder MakePublicProperty() => WithAccessModifier(Accessibility.Public);
 
@@ -185,6 +193,9 @@ namespace CodeGenHelpers
             return Class;
         }
 
+        public ClassBuilder MakeBackingField(string defaultValue = null, string safeValue = null) =>
+            WithValue(defaultValue, safeValue);
+
         public PropertyBuilder WithBackingField(string defaultValue = null, Accessibility? accessModifier = null)
         {
             var name = $"_{char.ToLower(Name[0])}{Name.Substring(1)}";
@@ -250,6 +261,13 @@ namespace CodeGenHelpers
                 _setter is null)
             {
                 writer.AppendLine($"{output} => {_getterExpression};");
+                return;
+            }
+
+            if(string.IsNullOrEmpty(_getterExpression) && string.IsNullOrEmpty(_setterExpression) &&
+                _getter is null && _setter is null)
+            {
+                writer.AppendLine($"{output};");
                 return;
             }
 
