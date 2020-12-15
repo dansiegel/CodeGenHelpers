@@ -122,7 +122,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ConstructorBuilder WithBaseCall(params string[] parameters)
+        public ConstructorBuilder WithBaseCall(Dictionary<string, string> parameters)
         {
             foreach (var parameter in parameters)
             {
