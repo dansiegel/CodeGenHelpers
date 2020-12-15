@@ -13,13 +13,13 @@ namespace CodeGenHelpers
                 : null;
         }
 
-        internal string? Summary { get; set; }
+        internal string Summary { get; set; }
 
-        internal Dictionary<string, string>? ParameterDoc { get; }
+        internal Dictionary<string, string> ParameterDoc { get; }
 
         internal bool InheritDoc { get; set; }
 
-        internal string? InheritFrom { get; set; }
+        internal string InheritFrom { get; set; }
 
         internal void Write(ref CodeWriter writer)
         {
@@ -47,11 +47,12 @@ namespace CodeGenHelpers
             }
         }
 
-        internal void RemoveUnusedParameters(Dictionary<string, string> parameters)
+        internal void RemoveUnusedParameters<T>(List<ParameterBuilder<T>> parameters)
+            where T : BuilderBase<T>, IParameterized<T>
         {
-            var unusedParameters = ParameterDoc.Where(p => !parameters.ContainsKey(p.Key)).ToArray();
-            foreach ((var name, var _) in unusedParameters)
-                ParameterDoc.Remove(name);
+            var unusedParameters = ParameterDoc.Where(p => !parameters.Any(x => x.Type == p.Key)).ToArray();
+            foreach (var parameter in unusedParameters)
+                ParameterDoc.Remove(parameter.Key);
         }
     }
 }

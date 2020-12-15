@@ -5,9 +5,9 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers
 {
-    public sealed class ConstructorBuilder : IBuilder
+    public sealed class ConstructorBuilder : BuilderBase<ConstructorBuilder>, IParameterized<ConstructorBuilder>
     {
-        private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
+        private readonly List<ParameterBuilder<ConstructorBuilder>> _parameters = new List<ParameterBuilder<ConstructorBuilder>>();
         private readonly List<string> _attributes = new List<string>();
         private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
 
@@ -20,6 +20,10 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             Class = classBuilder;
         }
+
+        List<ParameterBuilder<ConstructorBuilder>> IParameterized<ConstructorBuilder>.Parameters => _parameters;
+
+        ConstructorBuilder IParameterized<ConstructorBuilder>.Parent => this;
 
         public Accessibility? AccessModifier { get; }
 
@@ -54,50 +58,10 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ConstructorBuilder AddParameter(string typeName, string parameterName = null)
+        public override ConstructorBuilder AddAssemblyAttribute(string attribute)
         {
-            var validatedName = GetValidatedParameterName(parameterName, typeName);
-            _parameters[validatedName] = typeName;
+            Class.AddAssemblyAttribute(attribute);
             return this;
-        }
-
-        public ConstructorBuilder AddParameter(ITypeSymbol symbol, string parameterName = null)
-        {
-            var validatedName = GetValidatedParameterName(parameterName, symbol.Name);
-            _parameters.Add(validatedName, symbol.Name);
-            return AddNamespaceImport(symbol);
-        }
-
-        public ConstructorBuilder AddParameters(IEnumerable<IParameterSymbol> parameters)
-        {
-            if (parameters is null || !parameters.Any())
-                return this;
-
-            foreach (var parameter in parameters)
-                AddParameter(parameter.Type, parameter.Name);
-
-            return this;
-        }
-
-        private string GetValidatedParameterName(string parameterName, string typeName)
-        {
-            if (string.IsNullOrEmpty(parameterName))
-            {
-                parameterName = typeName.Split('.').Last();
-
-                if (parameterName[0] == 'I')
-                    parameterName = parameterName.Substring(1);
-
-                if (char.IsUpper(parameterName[0]))
-                    parameterName = char.ToLower(parameterName[0]) + parameterName.Substring(1);
-            }
-
-            int i = 1;
-            var validatedName = parameterName;
-            while (_parameters.ContainsKey(validatedName))
-                validatedName = $"{parameterName}{i++}";
-
-            return validatedName;
         }
 
         public ConstructorBuilder AddAttribute(string attribute)
@@ -115,68 +79,92 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ConstructorBuilder WithThisCall(params string[] parameters)
+        public ConstructorBuilder WithThisCall()
         {
-            _baseCall = () => $": this({string.Join(", ", parameters)})";
+            _baseCall = () => ": this()";
             return this;
         }
 
-        public ConstructorBuilder WithThisCall(IMethodSymbol baseConstructor)
+        public ConstructorBuilder WithThisCall(Dictionary<string, string> parameters)
         {
-            foreach (var symbol in baseConstructor.Parameters)
-                AddNamespaceImport(symbol);
+            foreach(var parameter in parameters)
+            {
+                this.AddParameter(parameter.Key, parameter.Value);
+            }
 
             _baseCall = () =>
             {
-                foreach (var param in baseConstructor.Parameters)
-                {
-                    if (!_parameters.ContainsKey(param.Type.Name) && !_parameters.ContainsKey(param.Type.GetFullMetadataName()))
-                        _parameters.Add(param.Type.Name, param.Name);
-                }
-
-                var output = _parameters.Where(x => baseConstructor.Parameters.Any(p => p.Type.Name == x.Key || p.Type.GetFullMetadataName() == x.Key)).Select(x => x.Key);
+                var output = parameters.Select(x => x.Value);
                 return $": this({string.Join(", ", output)})";
             };
             return this;
         }
 
-        public ConstructorBuilder WithBaseCall(params string[] parameters)
+        public ConstructorBuilder WithThisCall(IEnumerable<IParameterSymbol> parameters)
         {
-            _baseCall = () => $": base({string.Join(", ", parameters)})";
+            var dict = new Dictionary<string, string>();
+            foreach (var parameter in parameters ?? Array.Empty<IParameterSymbol>())
+            {
+                AddNamespaceImport(parameter.Type);
+                dict.Add(parameter.Type.Name, parameter.Name);
+            }
+            return WithThisCall(dict);
+        }
+
+        public ConstructorBuilder WithThisCall(IMethodSymbol baseConstructor)
+        {
+            return WithThisCall(baseConstructor.Parameters);
+        }
+
+        public ConstructorBuilder WithBaseCall()
+        {
+            _baseCall = () => ": base()";
             return this;
         }
 
-        public ConstructorBuilder WithBaseCall(IMethodSymbol baseConstructor)
+        public ConstructorBuilder WithBaseCall(params string[] parameters)
         {
-            foreach (var symbol in baseConstructor.Parameters)
-                AddNamespaceImport(symbol);
+            foreach (var parameter in parameters)
+            {
+                this.AddParameter(parameter.Key, parameter.Value);
+            }
 
             _baseCall = () =>
             {
-                foreach (var param in baseConstructor.Parameters)
-                {
-                    if (!_parameters.ContainsKey(param.Type.Name) && !_parameters.ContainsKey(param.Type.GetFullMetadataName()))
-                        _parameters.Add(param.Type.Name, param.Name);
-                }
-
-                var output = _parameters.Where(x => baseConstructor.Parameters.Any(p => p.Type.Name == x.Key || p.Type.GetFullMetadataName() == x.Key)).Select(x => x.Key);
+                var output = parameters.Select(x => x.Value);
                 return $": base({string.Join(", ", output)})";
             };
             return this;
         }
 
-        public ConstructorBuilder AddNamespaceImport(string namespaceImport)
+        public ConstructorBuilder WithBaseCall(IEnumerable<IParameterSymbol> parameters)
+        {
+            var dict = new Dictionary<string, string>();
+            foreach (var parameter in parameters ?? Array.Empty<IParameterSymbol>())
+            {
+                AddNamespaceImport(parameter.Type);
+                dict.Add(parameter.Type.Name, parameter.Name);
+            }
+            return WithBaseCall(dict);
+        }
+
+        public ConstructorBuilder WithBaseCall(IMethodSymbol baseConstructor)
+        {
+            return WithBaseCall(baseConstructor.Parameters);
+        }
+
+        public override ConstructorBuilder AddNamespaceImport(string namespaceImport)
         {
             Class.AddNamespaceImport(namespaceImport);
             return this;
         }
 
-        public ConstructorBuilder AddNamespaceImport(ISymbol symbol)
+        public override ConstructorBuilder AddNamespaceImport(ISymbol symbol)
         {
             return AddNamespaceImport(symbol.ContainingNamespace);
         }
 
-        public ConstructorBuilder AddNamespaceImport(INamespaceSymbol symbol)
+        public override ConstructorBuilder AddNamespaceImport(INamespaceSymbol symbol)
         {
             return AddNamespaceImport(symbol.ToString());
         }
@@ -186,7 +174,7 @@ namespace CodeGenHelpers
             return Class.AddConstructor(accessModifier);
         }
 
-        void IBuilder.Write(ref CodeWriter writer)
+        internal override void Write(ref CodeWriter writer)
         {
             _xmlDoc.RemoveUnusedParameters(_parameters);
             _xmlDoc.Write(ref writer);
@@ -199,7 +187,7 @@ namespace CodeGenHelpers
                 null => Class.AccessModifier.ToString().ToLower(),
                 _ => AccessModifier.ToString().ToLower()
             };
-            var parameters = _parameters.Any() ? string.Join(", ", _parameters.Select(x => $"{x.Value} {x.Key}")) : string.Empty;
+            var parameters = _parameters.Any() ? string.Join(", ", _parameters.Select(x => x.ToString())) : string.Empty;
             using(writer.Block($"{modifier} {Class.Name}({parameters})", _baseCall?.Invoke()))
             {
                 _methodBodyWriter?.Invoke(writer);

@@ -1,16 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers
 {
-    public class MethodBuilder : IBuilder
+    public class MethodBuilder : BuilderBase<MethodBuilder>, IBuilder, IParameterized<MethodBuilder>
     {
         private readonly List<string> _attributes = new List<string>();
         private readonly List<string> _constraints = new List<string>();
-        private readonly List<KeyValuePair<string, string>> _parameters = new List<KeyValuePair<string, string>>();
         private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
+        private readonly List<ParameterBuilder<MethodBuilder>> _parameters = new List<ParameterBuilder<MethodBuilder>>();
         private bool _override;
         private bool _virtual;
 
@@ -22,6 +22,9 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             Class = builder;
         }
+
+        List<ParameterBuilder<MethodBuilder>> IParameterized<MethodBuilder>.Parameters => _parameters;
+        MethodBuilder IParameterized<MethodBuilder>.Parent => this;
 
         public string Name { get; }
 
@@ -81,20 +84,26 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public MethodBuilder AddNamespaceImport(string importedNamespace)
+        public override MethodBuilder AddNamespaceImport(string importedNamespace)
         {
             Class.AddNamespaceImport(importedNamespace);
             return this;
         }
 
-        public MethodBuilder AddNamespaceImport(ISymbol symbol)
+        public override MethodBuilder AddNamespaceImport(ISymbol symbol)
         {
             return AddNamespaceImport(symbol.ContainingNamespace);
         }
 
-        public MethodBuilder AddNamespaceImport(INamespaceSymbol symbol)
+        public override MethodBuilder AddNamespaceImport(INamespaceSymbol symbol)
         {
             return AddNamespaceImport(symbol.ToString());
+        }
+
+        public override MethodBuilder AddAssemblyAttribute(string attribute)
+        {
+            Class.AddAssemblyAttribute(attribute);
+            return this;
         }
 
         public PropertyBuilder AddProperty(string name, Accessibility? accessModifier = null)
@@ -149,39 +158,6 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public MethodBuilder AddParameter(string typeName, string parameterName = null, int index = -1)
-        {
-            if (string.IsNullOrEmpty(parameterName))
-            {
-                parameterName = typeName.Split('.').Last();
-
-                if (parameterName[0] == 'I')
-                    parameterName = parameterName.Substring(1);
-
-                if (char.IsUpper(parameterName[0]))
-                    parameterName = char.ToLower(parameterName[0]) + parameterName.Substring(1);
-            }
-
-            int i = 1;
-            var validatedName = parameterName;
-            while (_parameters.Any(x => x.Key == validatedName))
-                validatedName = $"{parameterName}{i++}";
-
-            var parameter = new KeyValuePair<string, string>(validatedName, typeName);
-            if (index < 0)
-                _parameters.Add(parameter);
-            else
-                _parameters.Insert(index, parameter);
-
-            return this;
-        }
-
-        public MethodBuilder AddParameter(ITypeSymbol symbol, string parameterName = null, int index = -1)
-        {
-            return AddNamespaceImport(symbol)
-                .AddParameter(symbol.Name, parameterName, index);
-        }
-
         public MethodBuilder WithBody(Action<ICodeWriter> writerDelegate)
         {
             _methodBodyWriter = writerDelegate;
@@ -194,7 +170,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        void IBuilder.Write(ref CodeWriter writer)
+        internal override void Write(ref CodeWriter writer)
         {
             var output = string.IsNullOrEmpty(ReturnType) ? "void" : ReturnType.Trim();
             if (IsAsync)
@@ -207,10 +183,10 @@ namespace CodeGenHelpers
             else if (IsStatic)
                 output = $"static {output}";
 
-            var parameters = string.Join(", ", _parameters.Select(x => $"{x.Value} {x.Key}"));
+            var parameters = string.Join(", ", _parameters.Select(x => x.ToString()));
             output = $"{AccessModifier.Code()} {output} {Name}({parameters})";
 
-            _xmlDoc.RemoveUnusedParameters(_parameters.ToDictionary(p => p.Key, p => p.Value));
+            _xmlDoc.RemoveUnusedParameters(_parameters);
             _xmlDoc.Write(ref writer);
 
             foreach (var attribute in _attributes)
