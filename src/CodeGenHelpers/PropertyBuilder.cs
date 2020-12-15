@@ -23,6 +23,8 @@ namespace CodeGenHelpers
         private string _value;
         private string _safeValue;
         private bool _getOnly;
+        private bool _virtual;
+        private bool _override;
         private Accessibility? _setterAccessibility;
         private readonly List<string> _attributes = new List<string>();
         private readonly DocumentationComment _xmlDoc = new DocumentationComment();
@@ -114,11 +116,23 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             return this;
         }
+        
+        public PropertyBuilder Override(bool @override = true)
+        {
+            _override = true;
+            return this;
+        }
 
         public PropertyBuilder MakeStatic()
         {
             IsStatic = true;
             FieldTypeValue = FieldType.Const;
+            return this;
+        }
+
+        public PropertyBuilder MakeVirtualProperty()
+        {
+            _virtual = true;
             return this;
         }
 
@@ -216,11 +230,19 @@ namespace CodeGenHelpers
 
             var type = Type.Trim();
             var name = Name.Trim();
+            string additionalModifier = null;
+            if (_virtual)
+                additionalModifier = "virtual";
+            else if (_override)
+                additionalModifier = "override";
+
             var output = (FieldTypeValue switch
             {
                 FieldType.Const => $"{AccessModifier.Code()} const {type} {name}",
                 FieldType.ReadOnly => $"{AccessModifier.Code()} readonly {type} {name}",
-                _ => $"{AccessModifier.Code()} {type} {name}"
+                _ => additionalModifier is null 
+                    ? $"{AccessModifier.Code()} {type} {name}"
+                    : $"{AccessModifier.Code()} {additionalModifier} {type} {name}"
             }).Trim();
 
             if(FieldTypeValue != FieldType.Property)
