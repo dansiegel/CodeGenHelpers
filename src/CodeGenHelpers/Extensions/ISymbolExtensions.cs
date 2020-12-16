@@ -1,4 +1,4 @@
-﻿#if TEST
+﻿#if INCLUDE_ROSLYN_EXTENSIONS
 using System;
 using System.Collections.Generic;
 using System.Linq;
