@@ -31,7 +31,7 @@ namespace CodeGenHelpers
 
         public ClassBuilder Class { get; }
 
-        internal int Parameters => _parameters.Count;
+        internal int Count => _parameters.Count;
 
         public ConstructorBuilder WithSummary(string summary)
         {
