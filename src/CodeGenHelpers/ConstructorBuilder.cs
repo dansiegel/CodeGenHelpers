@@ -25,6 +25,8 @@ namespace CodeGenHelpers
 
         ConstructorBuilder IParameterized<ConstructorBuilder>.Parent => this;
 
+        public IReadOnlyCollection<ParameterBuilder<ConstructorBuilder>> Parameters => _parameters;
+
         public Accessibility? AccessModifier { get; }
 
         public ClassBuilder Class { get; }

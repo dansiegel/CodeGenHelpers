@@ -26,6 +26,8 @@ namespace CodeGenHelpers
         List<ParameterBuilder<MethodBuilder>> IParameterized<MethodBuilder>.Parameters => _parameters;
         MethodBuilder IParameterized<MethodBuilder>.Parent => this;
 
+        public IReadOnlyCollection<ParameterBuilder<MethodBuilder>> Parameters => _parameters;
+
         public string Name { get; }
 
         public string ReturnType { get; private set; }
