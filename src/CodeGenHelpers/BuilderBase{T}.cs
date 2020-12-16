@@ -9,5 +9,10 @@ namespace CodeGenHelpers
         public abstract T AddNamespaceImport(ISymbol symbol);
         public abstract T AddNamespaceImport(INamespaceSymbol symbol);
         public abstract T AddAssemblyAttribute(string attribute);
+        public T DisableWarning(string buildCode)
+        {
+            _pragmaWarnings.Add(buildCode);
+            return this as T;
+        }
     }
 }
