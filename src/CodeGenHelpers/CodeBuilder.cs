@@ -122,7 +122,6 @@ namespace CodeGenHelpers
                 }
             }
 
-            writer.NewLine();
             return writer;
         }
 
