@@ -105,6 +105,12 @@ namespace CodeGenHelpers
 
         public ClassBuilder SetBaseClass(INamedTypeSymbol symbol)
         {
+            if(symbol.Name == Name)
+            {
+                BaseClass = $"global::{symbol.GetFullMetadataName()}";
+                return this;
+            }
+
             BaseClass = symbol.Name;
             return AddNamespaceImport(symbol.ContainingNamespace);
         }
