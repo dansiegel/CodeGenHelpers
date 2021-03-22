@@ -47,8 +47,9 @@ namespace CodeGenHelpers.Tests
             var builder = CodeBuilder.Create(Namespace)
                 .AddNamespaceImport("System.ComponentModel")
                 .AddEnum("SampleEnum3")
+                    .MakePublicEnum()
                     .AddValue("Foo")
-                        .AddAttribute(@"Description(""Foo"")")
+                        .AddAttribute(@"Description(""Hello World"")")
                     .AddValue("Bar")
                         .AddAttribute(@"Description(""Bar"")")
                     .Enum;

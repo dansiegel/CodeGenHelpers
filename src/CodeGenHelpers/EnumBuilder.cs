@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -93,7 +93,7 @@ namespace CodeGenHelpers
 
             var queue = new Queue<IBuilder>();
             _values.OrderBy(x => x.Value)
-                .ThenBy(x => x.Name)
+                //.ThenBy(x => x.Name)
                 .ToList()
                 .ForEach(x => queue.Enqueue(x));
 
