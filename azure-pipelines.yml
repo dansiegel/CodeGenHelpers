@@ -7,28 +7,39 @@ variables:
 - name: BuildConfiguration
   value: Release
 
-pool:
-  vmImage: windows-latest
+stages:
+- stage: build
+  displayName: Build
+  jobs:
+  - job: buildAndTest
+    displayName: 'Build & Test'
+    pool:
+      vmImage: windows-latest
+    steps:
+    - task: DotNetCoreCLI@2
+      displayName: Generate NuGet Package
+      inputs:
+        command: 'pack'
+        packagesToPack: 'src/**/*.csproj'
+        versioningScheme: 'off'
 
-steps:
-- task: DotNetCoreCLI@2
-  displayName: Generate NuGet Package
-  inputs:
-    command: 'pack'
-    packagesToPack: 'src/**/*.csproj'
-    versioningScheme: 'off'
+    - task: DotNetCoreCLI@2
+      displayName: Run Unit Tests
+      inputs:
+        command: 'test'
+        projects: '**/*.csproj'
+        testRunTitle: 'Code Gen Helpers'
+        workingDirectory: 'tests'
 
-- task: DotNetCoreCLI@2
-  displayName: Run Unit Tests
-  inputs:
-    command: 'test'
-    projects: '**/*.csproj'
-    testRunTitle: 'Code Gen Helpers'
-    workingDirectory: 'tests'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'nuget'
+        publishLocation: 'pipeline'
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)'
-    artifact: 'nuget'
-    publishLocation: 'pipeline'
-
+    - task: NuGetCommand@2
+      inputs:
+        command: 'push'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+        nuGetFeedType: 'external'
+        publishFeedCredentials: 'SponsorConnect'
