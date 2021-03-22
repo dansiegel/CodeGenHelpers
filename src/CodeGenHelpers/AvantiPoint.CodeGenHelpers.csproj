@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <Description>The AvantiPoint CodeGenHelpers are exactly what you need for your Source Generation tasks. Whether you're writing Code Generators with Roslyn's built in Source Gen or Uno Platform's Source Generator's, this helps you more powerfully generate the code you need. This combines an understanding of some system types, Roslyn Symbol's and strings. The result is beautifully formated code that's easy to read and doesn't require you to track indentations or what's already been added to the class.</Description>
+    <PackageProjectUrl>https://github.com/dansiegel/CodeGenHelpers</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dansiegel/CodeGenHelpers.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>source generators;codegen;avantipoint;roslyn</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="**\*.cs" Exclude="obj\**\*.cs;bin\**\*.cs" Pack="True" Visible="False" PackagePath="build\CodeGenHelpers" />
+    <None Include="*.props" Pack="True" PackagePath="build\" />
+  </ItemGroup>
+</Project>

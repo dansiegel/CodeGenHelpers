@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CodeGenHelpers\**\*.cs" LinkBase="CodeGenHelpers" />
+    <LangVersion>latest</LangVersion>
+  <ItemGroup>
+</Project>
