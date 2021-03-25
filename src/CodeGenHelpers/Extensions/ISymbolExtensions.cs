@@ -1,5 +1,4 @@
-﻿#if INCLUDE_ROSLYN_EXTENSIONS
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers
 {
-    public static class ISymbolExtensions
+    internal static class ISymbolExtensions
     {
         private static readonly Dictionary<string, string> _fullNamesMaping = new Dictionary<string, string>
             (StringComparer.OrdinalIgnoreCase)
@@ -117,4 +116,3 @@ namespace CodeGenHelpers
         }
     }
 }
-#endif
