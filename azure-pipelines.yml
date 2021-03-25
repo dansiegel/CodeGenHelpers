@@ -16,6 +16,10 @@ stages:
     pool:
       vmImage: windows-latest
     steps:
+    - task: NuGetToolInstaller@1
+      inputs:
+        checkLatest: true
+
     - task: DotNetCoreCLI@2
       displayName: Generate NuGet Package
       inputs:
