@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace CodeGenHelpers
+namespace CodeGenHelpers.Internals
 {
     internal static class AccessibilityExtensions
     {

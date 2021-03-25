@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers

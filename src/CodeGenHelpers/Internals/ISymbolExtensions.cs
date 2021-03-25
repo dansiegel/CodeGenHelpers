@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
-namespace CodeGenHelpers
+namespace CodeGenHelpers.Internals
 {
     internal static class ISymbolExtensions
     {

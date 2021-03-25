@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers
