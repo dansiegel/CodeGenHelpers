@@ -20,17 +20,21 @@ stages:
       inputs:
         checkLatest: true
 
-    - task: DotNetCoreCLI@2
-      displayName: Generate NuGet Package
+    - task: NuGetCommand@2
+      displayName: NuGet Restore
       inputs:
-        command: 'pack'
-        packagesToPack: 'src/**/*.csproj'
-        versioningScheme: 'off'
+        command: restore
+
+    - task: MSBuild@1
+      displayName: Build & Pack
+      inputs:
+        configuration: $(BuildConfiguration)
 
     - task: DotNetCoreCLI@2
       displayName: Run Unit Tests
       inputs:
         command: 'test'
+        nobuild: true
         projects: '**/*.csproj'
         testRunTitle: 'Code Gen Helpers'
         workingDirectory: 'tests'
