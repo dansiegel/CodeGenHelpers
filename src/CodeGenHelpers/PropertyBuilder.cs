@@ -17,6 +17,7 @@ namespace CodeGenHelpers
 
         private bool _autoprops;
         internal FieldType FieldTypeValue = FieldType.Property;
+        internal ValueType PropertyValueType = ValueType.UserSpecified;
         private Action<ICodeWriter> _getter;
         private string _getterExpression;
         private Action<ICodeWriter> _setter;
@@ -184,27 +185,30 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder WithConstValue(string value, string safeValue = null)
+        public ClassBuilder WithConstValue(string value, string safeValue = null, ValueType valueType = ValueType.UserSpecified)
         {
             _value = value;
             _safeValue = safeValue;
             FieldTypeValue = FieldType.Const;
+            PropertyValueType = valueType;
             return Class;
         }
 
-        public ClassBuilder WithReadonlyValue(string value, string safeValue = null)
+        public ClassBuilder WithReadonlyValue(string value, string safeValue = null, ValueType valueType = ValueType.UserSpecified)
         {
             _value = value;
             _safeValue = safeValue;
             FieldTypeValue = FieldType.ReadOnly;
+            PropertyValueType = valueType;
             return Class;
         }
 
-        public ClassBuilder WithValue(string value, string safeValue = null)
+        public ClassBuilder WithValue(string value, string safeValue = null, ValueType valueType = ValueType.UserSpecified)
         {
             _value = value;
             _safeValue = safeValue;
             FieldTypeValue = FieldType.Default;
+            PropertyValueType = valueType;
             return Class;
         }
 
@@ -229,6 +233,13 @@ namespace CodeGenHelpers
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
 
+            var value = PropertyValueType switch
+            {
+                ValueType.Null => "null",
+                ValueType.Default => "default",
+                _ => _value
+            };
+
             var type = Type.Trim();
             var name = Name.Trim();
             string additionalModifier = null;
@@ -248,20 +259,20 @@ namespace CodeGenHelpers
 
             if(FieldTypeValue != FieldType.Property)
             {
-                if(string.IsNullOrEmpty(_value) && FieldTypeValue != FieldType.Const)
+                if(string.IsNullOrEmpty(value) && FieldTypeValue != FieldType.Const)
                 {
                     writer.AppendLine($"{output};");
                 }
-                else if (_value?.Length > 5)
+                else if (value?.Length > 5)
                 {
                     writer.AppendLine($"{output} =");
                     writer.IncreaseIndent();
-                    writer.AppendLine($"{_value};", $"{_safeValue ?? _value};");
+                    writer.AppendLine($"{value};", $"{_safeValue ?? value};");
                     writer.DecreaseIndent();
                 }
                 else
                 {
-                    writer.AppendLine($"{output} = {_value};", $"{output} = {_safeValue ?? _value};");
+                    writer.AppendLine($"{output} = {value};", $"{output} = {_safeValue ?? value};");
                 }
 
                 return;
