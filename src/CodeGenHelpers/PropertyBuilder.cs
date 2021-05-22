@@ -154,6 +154,9 @@ namespace CodeGenHelpers
             return Class;
         }
 
+        public ClassBuilder UseAutoProps() =>
+            UseAutoProps(null);
+
         public ClassBuilder UseAutoProps(Accessibility? setterAccessibility)
         {
             _autoprops = true;
@@ -193,6 +196,9 @@ namespace CodeGenHelpers
             PropertyValueType = valueType;
             return Class;
         }
+
+        public ClassBuilder WithReadonlyValue(ValueType valueType = ValueType.UserSpecified) =>
+            WithReadonlyValue(null, null, valueType);
 
         public ClassBuilder WithReadonlyValue(string value, string safeValue = null, ValueType valueType = ValueType.UserSpecified)
         {
@@ -242,6 +248,7 @@ namespace CodeGenHelpers
 
             var type = Type.Trim();
             var name = Name.Trim();
+            var _static = IsStatic ? " static" : null;
             string additionalModifier = null;
             if (_virtual)
                 additionalModifier = "virtual";
@@ -251,11 +258,13 @@ namespace CodeGenHelpers
             var output = (FieldTypeValue switch
             {
                 FieldType.Const => $"{AccessModifier.Code()} const {type} {name}",
-                FieldType.ReadOnly => $"{AccessModifier.Code()} readonly {type} {name}",
+                FieldType.ReadOnly => $"{AccessModifier.Code()}{_static} readonly {type} {name}",
                 _ => additionalModifier is null 
-                    ? $"{AccessModifier.Code()} {type} {name}"
+                    ? $"{AccessModifier.Code()}{_static} {type} {name}"
                     : $"{AccessModifier.Code()} {additionalModifier} {type} {name}"
             }).Trim();
+
+            var maxCharacters = (value?.StartsWith("\"") ?? false) ? 9 : 5;
 
             if(FieldTypeValue != FieldType.Property)
             {
@@ -263,7 +272,7 @@ namespace CodeGenHelpers
                 {
                     writer.AppendLine($"{output};");
                 }
-                else if (value?.Length > 5)
+                else if (value?.Length > maxCharacters)
                 {
                     writer.AppendLine($"{output} =");
                     writer.IncreaseIndent();
