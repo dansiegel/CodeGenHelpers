@@ -249,6 +249,7 @@ namespace CodeGenHelpers
             var type = Type.Trim();
             var name = Name.Trim();
             var _static = IsStatic ? " static" : null;
+            var isNew = name == nameof(Equals) ? " new" : string.Empty;
             string additionalModifier = null;
             if (_virtual)
                 additionalModifier = "virtual";
@@ -257,10 +258,10 @@ namespace CodeGenHelpers
 
             var output = (FieldTypeValue switch
             {
-                FieldType.Const => $"{AccessModifier.Code()} const {type} {name}",
-                FieldType.ReadOnly => $"{AccessModifier.Code()}{_static} readonly {type} {name}",
+                FieldType.Const => $"{AccessModifier.Code()}{isNew} const {type} {name}",
+                FieldType.ReadOnly => $"{AccessModifier.Code()}{isNew}{_static} readonly {type} {name}",
                 _ => additionalModifier is null 
-                    ? $"{AccessModifier.Code()}{_static} {type} {name}"
+                    ? $"{AccessModifier.Code()}{isNew}{_static} {type} {name}"
                     : $"{AccessModifier.Code()} {additionalModifier} {type} {name}"
             }).Trim();
 

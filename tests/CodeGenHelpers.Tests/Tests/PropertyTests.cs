@@ -134,6 +134,50 @@ namespace CodeGenHelpers.Tests
             AreEqual(expected, builder);
         }
 
+        [Fact]
+        public void AddsNewToEqualsProperty()
+        {
+            var builder = CodeBuilder.Create("AwesomeApp")
+                .AddClass("SampleClass")
+                .AddProperty("Equals")
+                .MakePublicProperty()
+                .SetType("string")
+                .UseAutoProps();
+
+            var expected = @"namespace AwesomeApp
+{
+    partial class SampleClass
+    {
+        public new string Equals { get; set; }
+    }
+}
+";
+
+            AreEqual(expected, builder);
+        }
+
+        [Fact]
+        public void AddsNewToEqualsConst()
+        {
+            var builder = CodeBuilder.Create("AwesomeApp")
+                .AddClass("SampleClass")
+                .AddProperty("Equals")
+                .MakePublicProperty()
+                .SetType("string")
+                .WithConstValue("\"foo\"");
+
+            var expected = @"namespace AwesomeApp
+{
+    partial class SampleClass
+    {
+        public new const string Equals = ""foo"";
+    }
+}
+";
+
+            AreEqual(expected, builder);
+        }
+
         private void AreEqual(string expected, ClassBuilder builder)
         {
             Assert.Equal(expected, builder.Build(), ignoreLineEndingDifferences: true, ignoreWhiteSpaceDifferences: true);
