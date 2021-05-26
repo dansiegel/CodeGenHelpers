@@ -9,10 +9,22 @@
     <PackageTags>source generators;codegen;avantipoint;roslyn</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>latest</LangVersion>
+
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddGeneratorsToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup>
     <None Update="ReadMe.txt" Pack="true" PackagePath="" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
+    <None Include="AvantiPoint.CodeGenHelpers.props" Pack="true" PackagePath="build" />
   </ItemGroup>
+
+  <Target Name="_AddGeneratorsToOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="*.cs" PackagePath="build/content" />
+      <TfmSpecificPackageFile Include="Internals\*.cs" PackagePath="build/content/Internals" />
+    </ItemGroup>
+  </Target>
 </Project>
