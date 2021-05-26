@@ -6,7 +6,6 @@ namespace CodeGenHelpers.Internals
 {
     internal static class CodeBuilderExtensions
     {
-
         private static readonly Dictionary<string, string> _mappings = new Dictionary<string, string>
         {
             { "Boolean", "bool" },

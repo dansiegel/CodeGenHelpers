@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !DISABLE_CODEGENHELPERS_SYMBOLEXTENSIONS
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,18 +12,18 @@ namespace CodeGenHelpers.Internals
         private static readonly Dictionary<string, string> _fullNamesMaping = new Dictionary<string, string>
             (StringComparer.OrdinalIgnoreCase)
             {
-                { "string",     typeof(string).ToString()},
-                { "long",       typeof(long).ToString()},
-                { "int",        typeof(int).ToString()},
-                { "short",      typeof(short).ToString()},
-                { "ulong",      typeof(ulong).ToString()},
-                { "uint",       typeof(uint).ToString()},
-                { "ushort",     typeof(ushort).ToString()},
-                { "byte",       typeof(byte).ToString()},
-                { "double",     typeof(double).ToString()},
-                { "float",      typeof(float).ToString()},
-                { "decimal",    typeof(decimal).ToString()},
-                { "bool",       typeof(bool).ToString()},
+                { "string",     typeof(string).ToString()  },
+                { "long",       typeof(long).ToString()    },
+                { "int",        typeof(int).ToString()     },
+                { "short",      typeof(short).ToString()   },
+                { "ulong",      typeof(ulong).ToString()   },
+                { "uint",       typeof(uint).ToString()    },
+                { "ushort",     typeof(ushort).ToString()  },
+                { "byte",       typeof(byte).ToString()    },
+                { "double",     typeof(double).ToString()  },
+                { "float",      typeof(float).ToString()   },
+                { "decimal",    typeof(decimal).ToString() },
+                { "bool",       typeof(bool).ToString()    },
             };
 
         public static string GetFullMetadataName(this INamespaceOrTypeSymbol symbol)
@@ -116,3 +117,4 @@ namespace CodeGenHelpers.Internals
         }
     }
 }
+#endif
