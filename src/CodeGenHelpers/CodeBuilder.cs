@@ -124,7 +124,7 @@ namespace CodeGenHelpers
                 while (clone.Any())
                 {
                     var output = clone.Dequeue();
-                    output.Write(ref writer);
+                    output.Write(writer);
 
                     if (clone.Any())
                         writer.NewLine();

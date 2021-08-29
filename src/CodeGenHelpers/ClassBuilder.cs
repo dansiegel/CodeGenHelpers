@@ -262,11 +262,11 @@ namespace CodeGenHelpers
 
         public string BuildSafe() => Builder.BuildSafe();
 
-        internal override void Write(ref CodeWriter writer)
+        internal override void Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(ref writer);
+            _xmlDoc.Write(writer);
 
-            WriteClassAttributes(_classAttributes, ref writer);
+            WriteClassAttributes(_classAttributes, writer);
 
             var staticDeclaration = IsStatic ? "static " : string.Empty;
 
@@ -301,19 +301,19 @@ namespace CodeGenHelpers
             using (writer.Block(string.Join(" ", classDeclaration.Where(x => !string.IsNullOrEmpty(x))), _constraints.ToArray()))
             {
                 var hadOutput = false;
-                hadOutput = InvokeBuilderWrite(_events, ref hadOutput, ref writer);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false), ref hadOutput, ref writer, true);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == true), ref hadOutput, ref writer, true);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.ReadOnly), ref hadOutput, ref writer, true);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Default), ref hadOutput, ref writer, true);
-                hadOutput = InvokeBuilderWrite(_constructors, ref hadOutput, ref writer);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Property), ref hadOutput, ref writer);
-                hadOutput = InvokeBuilderWrite(_methods, ref hadOutput, ref writer);
-                InvokeBuilderWrite(_nestedClass, ref hadOutput, ref writer);
+                hadOutput = InvokeBuilderWrite(_events, ref hadOutput, writer);
+                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false), ref hadOutput, writer, true);
+                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == true), ref hadOutput, writer, true);
+                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.ReadOnly), ref hadOutput, writer, true);
+                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Default), ref hadOutput, writer, true);
+                hadOutput = InvokeBuilderWrite(_constructors, ref hadOutput, writer);
+                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Property), ref hadOutput, writer);
+                hadOutput = InvokeBuilderWrite(_methods, ref hadOutput, writer);
+                InvokeBuilderWrite(_nestedClass, ref hadOutput, writer);
             }
         }
 
-        private static void WriteClassAttributes(IEnumerable<string> classAttributes, ref CodeWriter writer)
+        private static void WriteClassAttributes(IEnumerable<string> classAttributes, in CodeWriter writer)
         {
             foreach (var attr in classAttributes.Distinct().OrderBy(x => x))
             {
@@ -321,7 +321,7 @@ namespace CodeGenHelpers
             }
         }
 
-        private static bool InvokeBuilderWrite<T>(IEnumerable<T> builders, ref bool hadOutput, ref CodeWriter writer, bool group = false)
+        private static bool InvokeBuilderWrite<T>(IEnumerable<T> builders, ref bool hadOutput, in CodeWriter writer, bool group = false)
             where T : IBuilder
         {
             if (builders is null || !builders.Any())
@@ -337,7 +337,7 @@ namespace CodeGenHelpers
             while (queue.Any())
             {
                 var builder = queue.Dequeue();
-                builder.Write(ref writer);
+                builder.Write(writer);
 
                 if (!group && queue.Any())
                     writer.NewLine();

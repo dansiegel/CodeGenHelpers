@@ -39,7 +39,7 @@ namespace CodeGenHelpers
             {
                 foreach (IBuilder @case in _switchCases)
                 {
-                    @case.Write(ref writer);
+                    @case.Write(writer);
                 }
             }
         }

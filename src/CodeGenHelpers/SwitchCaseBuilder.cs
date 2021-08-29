@@ -26,7 +26,7 @@ namespace CodeGenHelpers
             return _parent;
         }
 
-        void IBuilder.Write(ref CodeWriter writer)
+        void IBuilder.Write(in CodeWriter writer)
         {
             if (_parent.Expression)
             {

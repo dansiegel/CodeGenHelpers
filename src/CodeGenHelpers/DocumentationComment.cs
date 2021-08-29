@@ -21,7 +21,7 @@ namespace CodeGenHelpers
 
         internal string InheritFrom { get; set; }
 
-        internal void Write(ref CodeWriter writer)
+        internal void Write(in CodeWriter writer)
         {
             if (InheritDoc)
             {

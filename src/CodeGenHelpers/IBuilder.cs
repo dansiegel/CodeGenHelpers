@@ -2,6 +2,6 @@
 {
     internal interface IBuilder
     {
-        void Write(ref CodeWriter writer);
+        void Write(in CodeWriter writer);
     }
 }
