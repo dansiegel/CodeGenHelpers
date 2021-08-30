@@ -165,7 +165,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        internal override void Write(ref CodeWriter writer)
+        internal override void Write(in CodeWriter writer)
         {
             var @static = _static ? "static " : string.Empty;
             var eventDeclaration = $"{_declaredAccessibility.Code()} {@static}event {_eventDelegateType} {Name}";

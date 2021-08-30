@@ -88,9 +88,9 @@ namespace CodeGenHelpers
             return this;
         }
 
-        void IBuilder.Write(ref CodeWriter writer)
+        void IBuilder.Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(ref writer);
+            _xmlDoc.Write(writer);
 
             var queue = new Queue<IBuilder>();
             _values.OrderBy(x => x.Value)
@@ -115,7 +115,7 @@ namespace CodeGenHelpers
                 while (queue.Any())
                 {
                     var value = queue.Dequeue();
-                    value.Write(ref writer);
+                    value.Write(writer);
 
                     if (queue.Any())
                     {

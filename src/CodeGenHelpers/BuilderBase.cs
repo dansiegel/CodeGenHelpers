@@ -7,9 +7,9 @@ namespace CodeGenHelpers
     {
         protected readonly List<string> _pragmaWarnings = new List<string>();
 
-        internal abstract void Write(ref CodeWriter writer);
+        internal abstract void Write(in CodeWriter writer);
 
-        void IBuilder.Write(ref CodeWriter writer)
+        void IBuilder.Write(in CodeWriter writer)
         {
             var warnings = string.Join(", ", _pragmaWarnings.Distinct());
             if(_pragmaWarnings.Any())
@@ -17,7 +17,7 @@ namespace CodeGenHelpers
                 writer.AppendUnindentedLine($"#pragma warning disable {warnings}");
             }
 
-            Write(ref writer);
+            Write(writer);
 
             if (_pragmaWarnings.Any())
             {

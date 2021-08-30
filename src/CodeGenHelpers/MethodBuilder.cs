@@ -173,7 +173,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        internal override void Write(ref CodeWriter writer)
+        internal override void Write(in CodeWriter writer)
         {
             var output = string.IsNullOrEmpty(ReturnType) ? "void" : ReturnType.Trim();
             if (IsAsync)
@@ -190,7 +190,7 @@ namespace CodeGenHelpers
             output = $"{AccessModifier.Code()} {output} {Name}({parameters})";
 
             _xmlDoc.RemoveUnusedParameters(_parameters);
-            _xmlDoc.Write(ref writer);
+            _xmlDoc.Write(writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");

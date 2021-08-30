@@ -56,9 +56,9 @@ namespace CodeGenHelpers
             return this;
         }
 
-        void IBuilder.Write(ref CodeWriter writer)
+        void IBuilder.Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(ref writer);
+            _xmlDoc.Write(writer);
 
             foreach (var attr in _attributes.OrderBy(x => x))
             {

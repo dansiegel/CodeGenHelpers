@@ -176,10 +176,10 @@ namespace CodeGenHelpers
             return Class.AddConstructor(accessModifier);
         }
 
-        internal override void Write(ref CodeWriter writer)
+        internal override void Write(in CodeWriter writer)
         {
             _xmlDoc.RemoveUnusedParameters(_parameters);
-            _xmlDoc.Write(ref writer);
+            _xmlDoc.Write(writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
