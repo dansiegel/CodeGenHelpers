@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Remove="SampleCode\**\*.cs" />
+    <Compile Include="SampleCode\MyComplexClass.cs" />
     <None Include="SampleCode\**\*.cs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
