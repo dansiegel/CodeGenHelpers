@@ -1,18 +1,13 @@
-﻿using System.IO;
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace CodeGenHelpers.Tests
 {
-    public class EnumTests
+    public class EnumTests : TestBase
     {
-        public const string Namespace = "CodeGenHelpers.SampleCode";
-
-        private ITestOutputHelper testOutputHelper { get; }
-
         public EnumTests(ITestOutputHelper testOutput)
+            : base(testOutput)
         {
-            testOutputHelper = testOutput;
         }
 
         [Fact]
@@ -55,16 +50,6 @@ namespace CodeGenHelpers.Tests
                     .Enum;
 
             MakeAssertion(builder);
-        }
-
-        private void MakeAssertion(EnumBuilder builder)
-        {
-            var file = File.ReadAllText(Path.Combine("SampleCode", $"{builder.Name}.cs"));
-            testOutputHelper.WriteLine("*** ACTUAL OUTPUT ***");
-            var actual = builder.Builder.Build();
-            testOutputHelper.WriteLine(actual);
-
-            Assert.Equal(file, actual, ignoreLineEndingDifferences: true);
         }
     }
 }

@@ -16,6 +16,10 @@ stages:
     pool:
       vmImage: windows-latest
     steps:
+    - task: UseDotNet@2
+      inputs:
+        useGlobalJson: true
+
     - task: NuGetToolInstaller@1
       inputs:
         checkLatest: true
