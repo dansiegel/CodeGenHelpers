@@ -20,7 +20,7 @@ namespace CodeGenHelpers.Tests
         {
             var builder = CodeBuilder.Create("AwesomeApp")
                 .AddClass("SampleClass")
-                .MakeAbstractClass();
+                .Abstract();
 
             var expected = @"namespace AwesomeApp
 {

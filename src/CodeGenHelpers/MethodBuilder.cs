@@ -122,9 +122,9 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public MethodBuilder MakeAbstract()
+        public MethodBuilder Abstract(bool isAbstract = true)
         {
-            IsAbstract = true;
+            IsAbstract = isAbstract;
             return this;
         }
 

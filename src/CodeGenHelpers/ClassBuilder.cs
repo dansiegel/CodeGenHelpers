@@ -250,9 +250,9 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder MakeAbstractClass()
+        public ClassBuilder Abstract(bool isAbstract = true)
         {
-            IsAbstract = true;
+            IsAbstract = isAbstract;
             return this;
         }
 
