@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="CodeGenHelpers.Tests" />
     <None Update="ReadMe.txt" Pack="true" PackagePath="" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
     <None Include="AvantiPoint.CodeGenHelpers.props" Pack="true" PackagePath="build" />

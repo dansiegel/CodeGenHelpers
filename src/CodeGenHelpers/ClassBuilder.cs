@@ -17,7 +17,7 @@ namespace CodeGenHelpers
         private readonly List<PropertyBuilder> _properties = new List<PropertyBuilder>();
         private readonly List<MethodBuilder> _methods = new List<MethodBuilder>();
         private readonly Queue<ClassBuilder> _nestedClass = new Queue<ClassBuilder>();
-        private readonly List<string> _constraints = new List<string>();
+        private readonly GenericCollection _generics = new GenericCollection();
         private readonly bool _isPartial;
         private readonly DocumentationComment _xmlDoc = new DocumentationComment();
 
@@ -118,9 +118,21 @@ namespace CodeGenHelpers
             return AddNamespaceImport(symbol.ContainingNamespace);
         }
 
-        public ClassBuilder AddConstraint(string constraint)
+        public ClassBuilder AddGeneric(string name) =>
+            AddGeneric(name, _ => { });
+
+        public ClassBuilder AddGeneric(string name, Action<GenericBuilder> configureBuilder)
         {
-            _constraints.Add(constraint);
+            if(configureBuilder is null)
+                throw new ArgumentNullException(nameof(configureBuilder));
+            else if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+            else if (_generics.Any(x => x.Name == name))
+                throw new ArgumentException($"The argument {name} already exists");
+
+            var builder = new GenericBuilder(name);
+            configureBuilder(builder);
+            _generics.Add(builder);
             return this;
         }
 
@@ -303,11 +315,11 @@ namespace CodeGenHelpers
                 IsAbstract ? "abstract" : null,
                 _isPartial ? "partial" : null,
                 Kind.ToString().ToLower(),
-                Name,
+                $"{Name}{_generics}",
                 extra
             };
 
-            using (writer.Block(string.Join(" ", classDeclaration.Where(x => !string.IsNullOrEmpty(x))), _constraints.ToArray()))
+            using (writer.Block(string.Join(" ", classDeclaration.Where(x => !string.IsNullOrEmpty(x))), _generics.Contraints()))
             {
                 var hadOutput = false;
                 hadOutput = InvokeBuilderWrite(_events, ref hadOutput, writer);

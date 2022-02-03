@@ -9,7 +9,7 @@ namespace CodeGenHelpers
     public class MethodBuilder : BuilderBase<MethodBuilder>, IBuilder, IParameterized<MethodBuilder>
     {
         private readonly List<string> _attributes = new List<string>();
-        private readonly List<string> _constraints = new List<string>();
+        private readonly GenericCollection _generics = new GenericCollection();
         private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
         private readonly List<ParameterBuilder<MethodBuilder>> _parameters = new List<ParameterBuilder<MethodBuilder>>();
         private bool _override;
@@ -83,9 +83,21 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public MethodBuilder AddConstraint(string constraint)
+        public MethodBuilder AddGeneric(string name) =>
+            AddGeneric(name, _ => { });
+
+        public MethodBuilder AddGeneric(string name, Action<GenericBuilder> configureBuilder)
         {
-            _constraints.Add(constraint);
+            if (configureBuilder is null)
+                throw new ArgumentNullException(nameof(configureBuilder));
+            else if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+            else if (_generics.Any(x => x.Name == name))
+                throw new ArgumentException($"The argument {name} already exists");
+
+            var builder = new GenericBuilder(name);
+            configureBuilder(builder);
+            _generics.Add(builder);
             return this;
         }
 
@@ -197,14 +209,14 @@ namespace CodeGenHelpers
                 output = $"static {output}";
 
             var parameters = string.Join(", ", _parameters.Select(x => x.ToString()));
-            output = $"{AccessModifier.Code()} {output} {Name}({parameters})";
+            output = $"{AccessModifier.Code()} {output} {Name}{_generics}({parameters})";
 
             _xmlDoc.RemoveUnusedParameters(_parameters);
             _xmlDoc.Write(writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
-            using (writer.Block(output.Trim(), _constraints.ToArray()))
+            using (writer.Block(output.Trim(), _generics.Contraints()))
             {
                 _methodBodyWriter?.Invoke(writer);
             }
