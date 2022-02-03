@@ -50,6 +50,8 @@ namespace CodeGenHelpers
 
         public bool IsStatic { get; private set; }
 
+        public bool IsAbstract { get; private set; }
+
         public bool IsSealed { get; private set; }
 
         public ClassBuilder WithSummary(string summary)
@@ -248,6 +250,12 @@ namespace CodeGenHelpers
             return this;
         }
 
+        public ClassBuilder Abstract(bool isAbstract = true)
+        {
+            IsAbstract = isAbstract;
+            return this;
+        }
+
         public ClassBuilder AddNestedClass(string name, Accessibility? accessModifier = null)
         {
             var builder = new ClassBuilder(name, Builder, false);
@@ -292,6 +300,7 @@ namespace CodeGenHelpers
                 AccessModifier.Code(),
                 IsStatic ? "static" : null,
                 IsSealed ? "sealed" : null,
+                IsAbstract ? "abstract" : null,
                 _isPartial ? "partial" : null,
                 Kind.ToString().ToLower(),
                 Name,
