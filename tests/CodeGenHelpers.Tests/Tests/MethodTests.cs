@@ -1,31 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
 namespace CodeGenHelpers.Tests
 {
-    public class ClassTests
+    public class MethodTests
     {
         private readonly ITestOutputHelper _testOutputHelper;
 
-        public ClassTests(ITestOutputHelper testOutputHelper)
+        public MethodTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
         }
 
         [Fact]
-        public void GenerateAbstractClass()
+        public void GenerateAbstractMethod()
         {
             var builder = CodeBuilder.Create("AwesomeApp")
                 .AddClass("SampleClass")
-                .MakeAbstractClass();
+                .AddMethod("MyAbstractMethod")
+                .MakeAbstract()
+                .Class;
 
             var expected = @"namespace AwesomeApp
 {
-    abstract partial class SampleClass
+    partial class SampleClass
     {
+        abstract void MyAbstractMethod()
+        {
+        }
     }
 }
 ";

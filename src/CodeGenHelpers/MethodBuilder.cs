@@ -35,6 +35,8 @@ namespace CodeGenHelpers
 
         public bool IsAsync { get; private set; }
 
+        public bool IsAbstract { get; private set; }
+
         public bool HasBody
         {
             get
@@ -120,6 +122,12 @@ namespace CodeGenHelpers
             return this;
         }
 
+        public MethodBuilder MakeAbstract()
+        {
+            IsAbstract = true;
+            return this;
+        }
+
         public MethodBuilder MakePublicMethod() => WithAccessModifier(Accessibility.Public);
 
         public MethodBuilder MakePrivateMethod() => WithAccessModifier(Accessibility.Private);
@@ -183,6 +191,8 @@ namespace CodeGenHelpers
                 output = $"override {output}";
             else if (_virtual)
                 output = $"virtual {output}";
+            else if (IsAbstract)
+                output = $"abstract {output}";
             else if (IsStatic)
                 output = $"static {output}";
 
