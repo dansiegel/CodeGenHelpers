@@ -11,8 +11,6 @@ namespace CodeGenHelpers.SampleCode
 {
     partial class SampleAbstractMethod
     {
-        abstract void MyAbstractMethod()
-        {
-        }
+         abstract void MyAbstractMethod();
     }
 }
