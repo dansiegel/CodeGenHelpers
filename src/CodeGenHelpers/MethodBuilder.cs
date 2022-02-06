@@ -216,6 +216,13 @@ namespace CodeGenHelpers
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
+
+            if (IsAbstract)
+            {
+                writer.AppendLine($"{output};");
+                return;
+            }
+
             using (writer.Block(output.Trim(), _generics.Contraints()))
             {
                 _methodBodyWriter?.Invoke(writer);
