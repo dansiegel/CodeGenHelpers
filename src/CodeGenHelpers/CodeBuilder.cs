@@ -23,7 +23,7 @@ namespace CodeGenHelpers
         public IndentStyle IndentStyle { get; }
 
         public IReadOnlyList<ClassBuilder> Classes => _classes.OfType<ClassBuilder>().ToList();
-        public IReadOnlyList<RecordPositionalBuilder> Records => _classes.OfType<RecordPositionalBuilder>().ToList();
+        public IReadOnlyList<RecordBuilder> Records => _classes.OfType<RecordBuilder>().ToList();
 
         public IReadOnlyList<EnumBuilder> Enums => _classes.OfType<EnumBuilder>().ToList();
 
@@ -78,9 +78,9 @@ namespace CodeGenHelpers
             return AddClass(symbol.Name);
         }
 
-        public RecordPositionalBuilder AddPositionalRecord(string name)
+        public RecordBuilder AddRecord(string name)
         {
-            var builder = new RecordPositionalBuilder(name, Accessibility.Public, this);
+            var builder = new RecordBuilder(name, Accessibility.Public, this);
             _classes.Enqueue(builder);
             return builder;
         }
