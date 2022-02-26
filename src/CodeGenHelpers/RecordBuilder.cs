@@ -65,7 +65,6 @@ public sealed class RecordBuilder : BuilderBase<RecordBuilder>
             {
                 foreach (RecordPropertyBuilder property in _properties)
                 {
-
                     writer.AppendLine(property.ToInitProperty());
                 }
             }

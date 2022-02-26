@@ -37,7 +37,7 @@ public class RecordPropertyBuilder
     public string ToInitProperty()
     {
         string defaultValue = HasDefaultValue ? $" = {DefaultValue};" : string.Empty;
-        return $"{AccessModifier.Code()} {Type} {Name} {{get; init; }}{defaultValue}";
+        return $"{AccessModifier.Code()} {Type} {Name} {{ get; init; }}{defaultValue}";
     }
 
     public RecordPropertyBuilder WithDefaultValue(string defaultValue)

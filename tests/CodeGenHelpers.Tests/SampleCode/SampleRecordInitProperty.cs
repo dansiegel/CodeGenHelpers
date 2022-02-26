@@ -14,6 +14,5 @@ namespace CodeGenHelpers.SampleCode
         public string FirstName { get; init; }
         public string LastName { get; init; }
         public int Age { get; init; } = 1;
-
     }
 }

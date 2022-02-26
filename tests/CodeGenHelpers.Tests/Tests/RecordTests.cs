@@ -32,11 +32,11 @@ public class RecordTests : TestBase
         var builder = CodeBuilder.Create(Namespace)
             .AddRecord(nameof(SampleRecordInitProperty))
             .UseInitProperties()
-            .AddProperty("string", "firstName")
+            .AddProperty("string", "FirstName")
             .Record
             .AddProperty("string", "LastName")
             .Record
-            .AddProperty("int", "age")
+            .AddProperty("int", "Age")
             .WithDefaultValue(1)
             .Record;
 
