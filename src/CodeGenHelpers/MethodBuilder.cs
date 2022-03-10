@@ -219,7 +219,7 @@ namespace CodeGenHelpers
 
             if (IsAbstract)
             {
-                writer.AppendLine($"{output};");
+                writer.AppendLine($"{output.Trim()};");
                 return;
             }
 
