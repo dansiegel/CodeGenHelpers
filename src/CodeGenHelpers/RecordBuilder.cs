@@ -1,0 +1,107 @@
+using System.Collections.Generic;
+using System.Linq;
+using CodeGenHelpers.Internals;
+using Microsoft.CodeAnalysis;
+
+namespace CodeGenHelpers
+{
+    public sealed class RecordBuilder : BuilderBase<RecordBuilder>
+    {
+        private readonly List<RecordPropertyBuilder> _properties = new List<RecordPropertyBuilder>();
+        private readonly List<string> _attributes = new List<string>();
+        private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
+
+        internal RecordBuilder(string name, CodeBuilder codeBuilder)
+        {
+            Name = name;
+            Builder = codeBuilder;
+        }
+
+        public string Name { get; }
+
+        public CodeBuilder Builder { get; }
+
+        public Accessibility? AccessModifier { get; private set; }
+
+        public RecordPropertyType PropertyType { get; private set; } = RecordPropertyType.Positional;
+
+        public RecordBuilder UsePositionalProperties()
+        {
+            PropertyType = RecordPropertyType.Positional;
+            return this;
+        }
+
+        public RecordBuilder UseInitProperties()
+        {
+            PropertyType = RecordPropertyType.Init;
+            return this;
+        }
+
+        public RecordPropertyBuilder AddProperty(string type,
+            string name,
+            Accessibility accessModifier = Accessibility.Public)
+        {
+            var prop = new RecordPropertyBuilder(type, name, accessModifier, this);
+            _properties.Add(prop);
+            return prop;
+        }
+
+        public RecordBuilder MakePublicRecord() => WithAccessModifier(Accessibility.Public);
+
+        public RecordBuilder MakeInternalRecord() => WithAccessModifier(Accessibility.Internal);
+
+        public RecordBuilder WithAccessModifier(Accessibility accessModifier)
+        {
+            AccessModifier = accessModifier;
+            return this;
+        }
+
+        internal override void Write(in CodeWriter writer)
+        {
+            _xmlDoc.Write(writer);
+
+            foreach (var attribute in _attributes)
+                writer.AppendLine($"[{attribute}]");
+
+            if (PropertyType == RecordPropertyType.Init)
+            {
+                using (writer.Block($"{AccessModifier.Code()} record {Name}"))
+                {
+                    foreach (RecordPropertyBuilder property in _properties)
+                    {
+                        writer.AppendLine(property.ToInitProperty());
+                    }
+                }
+
+                return;
+            }
+
+            var properties = _properties.Any() ? string.Join(", ", _properties.Select(x => x.ToPositionalProperty())) : string.Empty;
+            writer.AppendLine($"{AccessModifier.Code()} record {Name}({properties});");
+        }
+
+        public override RecordBuilder AddNamespaceImport(string importedNamespace)
+        {
+            Builder.AddNamespaceImport(importedNamespace);
+            return this;
+        }
+
+        public override RecordBuilder AddNamespaceImport(ISymbol symbol)
+        {
+            Builder.AddNamespaceImport(symbol);
+            return this;
+        }
+
+        public override RecordBuilder AddNamespaceImport(INamespaceSymbol symbol)
+        {
+            Builder.AddNamespaceImport(symbol);
+            return this;
+        }
+
+        public override RecordBuilder AddAssemblyAttribute(string attribute)
+        {
+            Builder.AddAssemblyAttribute(attribute);
+            return this;
+        }
+    }
+}

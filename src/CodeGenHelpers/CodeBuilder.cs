@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -28,6 +28,7 @@ the code is regenerated.";
         public IndentStyle IndentStyle { get; }
 
         public IReadOnlyList<ClassBuilder> Classes => _classes.OfType<ClassBuilder>().ToList();
+        public IReadOnlyList<RecordBuilder> Records => _classes.OfType<RecordBuilder>().ToList();
 
         public IReadOnlyList<EnumBuilder> Enums => _classes.OfType<EnumBuilder>().ToList();
 
@@ -80,6 +81,13 @@ the code is regenerated.";
         public ClassBuilder AddClass(ITypeSymbol symbol)
         {
             return AddClass(symbol.Name);
+        }
+
+        public RecordBuilder AddRecord(string name)
+        {
+            var builder = new RecordBuilder(name, this);
+            _classes.Enqueue(builder);
+            return builder;
         }
 
         public EnumBuilder AddEnum(string name)
