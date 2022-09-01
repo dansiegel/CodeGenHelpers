@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using Microsoft.CodeAnalysis;
+using Moq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -42,6 +44,28 @@ namespace CodeGenHelpers.Tests
             testOutputHelper.WriteLine(actual);
 
             Assert.Equal(file, actual, ignoreLineEndingDifferences: true);
+        }
+
+        protected INamedTypeSymbol GetSymbol(string @namespace, string name)
+        {
+            var typeSymbol = new Mock<INamedTypeSymbol>();
+            var namespaceSymbol = new Mock<INamespaceSymbol>();
+            namespaceSymbol.Setup(x => x.Name)
+                .Returns(@namespace);
+            namespaceSymbol.Setup(x => x.MetadataName)
+                .Returns(@namespace);
+            namespaceSymbol.Setup(x => x.ToString())
+                .Returns(@namespace);
+            typeSymbol.Setup(x => x.Name)
+                .Returns(name);
+            typeSymbol.Setup(x => x.MetadataName)
+                .Returns(name);
+            typeSymbol.Setup(x => x.ContainingNamespace)
+                .Returns(namespaceSymbol.Object);
+            typeSymbol.Setup(x => x.ToDisplayString(It.IsAny<SymbolDisplayFormat>()))
+                .Returns($"{@namespace}.{name}");
+
+            return typeSymbol.Object;
         }
     }
 }

@@ -21,5 +21,19 @@ namespace CodeGenHelpers.Tests
 
             MakeAssertion(builder);
         }
+
+        [Fact]
+        public void GenerateMethodWithPrimitiveParameter()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .AddClass("SamplePrimitiveParameter")
+                .AddMethod("MyPrimitiveMethod")
+                .MakePublicMethod()
+                .AddParameter(GetSymbol("System", "String"), "myParameter")
+                .WithBody(x => x.AppendLine(@"Console.WriteLine(""Hello {0}"", myParameter);"))
+                .Class;
+
+            MakeAssertion(builder);
+        }
     }
 }

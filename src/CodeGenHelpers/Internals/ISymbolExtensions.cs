@@ -30,6 +30,21 @@ namespace CodeGenHelpers.Internals
                 { "bool",       typeof(bool).ToString()    },
             };
 
+        public static string GetGloballyQualifiedTypeName(this INamespaceOrTypeSymbol symbol)
+        {
+            var value = GetFullMetadataName(symbol);
+            if(_fullNamesMaping.Any(x => x.Value == value))
+            {
+                return _fullNamesMaping.First(x => x.Value == value).Key;
+            }
+            else if(_fullNamesMaping.Any(x => x.Value == $"System.Nullable`1[{value}]"))
+            {
+                return _fullNamesMaping.First(x => x.Value == $"System.Nullable`1[{value}]").Key + "?";
+            }
+
+            return value;
+        }
+
         public static string GetFullMetadataName(this INamespaceOrTypeSymbol symbol)
         {
             ISymbol s = symbol;
@@ -86,9 +101,9 @@ namespace CodeGenHelpers.Internals
                 return $"System.Nullable`1[{t.GetFullName()}]";
             }
 
-            var name = type.ToDisplayString();
+            var name = type.ToDisplayString() ?? string.Empty;
 
-            if (_fullNamesMaping.TryGetValue(name, out string output))
+            if (!_fullNamesMaping.TryGetValue(name, out string output))
             {
                 output = name;
             }
