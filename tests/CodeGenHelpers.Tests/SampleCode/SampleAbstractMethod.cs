@@ -9,7 +9,7 @@
 
 namespace CodeGenHelpers.SampleCode
 {
-    partial class SampleAbstractMethod
+    abstract partial class SampleAbstractMethod
     {
         abstract void MyAbstractMethod();
     }

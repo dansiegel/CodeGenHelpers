@@ -308,6 +308,9 @@ namespace CodeGenHelpers
                 writer.AppendLine($"[{attr}]");
             }
 
+            if (_methods.Any(x => x.IsAbstract))
+                IsAbstract = true;
+
             var classDeclaration = new[] {
                 AccessModifier.Code(),
                 IsStatic ? "static" : null,
