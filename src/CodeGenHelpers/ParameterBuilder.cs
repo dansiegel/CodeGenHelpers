@@ -1,5 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public class ParameterBuilder<T>
@@ -12,9 +16,9 @@ namespace CodeGenHelpers
 
         public T Parent { get; }
 
-        public string Type { get; internal set; }
-        public string Name { get; internal set; }
-        public string DefaultValue { get; internal set; }
+        public string? Type { get; internal set; }
+        public string? Name { get; internal set; }
+        public string? DefaultValue { get; internal set; }
         public bool HasDefaultValue { get; internal set; }
 
         public ParameterBuilder<T> WithType(string typeName)
@@ -39,7 +43,7 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ParameterBuilder<T> WithDefaultValue(object value) =>
+        public ParameterBuilder<T> WithDefaultValue(object? value) =>
             WithDefaultValue($"{value}");
 
         public ParameterBuilder<T> WithNullDefault() =>

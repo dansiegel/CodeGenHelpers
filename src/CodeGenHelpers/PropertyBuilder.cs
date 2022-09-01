@@ -1,8 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0008
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public class PropertyBuilder : IBuilder
@@ -18,18 +22,17 @@ namespace CodeGenHelpers
         private bool _autoprops;
         internal FieldType FieldTypeValue = FieldType.Property;
         internal ValueType PropertyValueType = ValueType.UserSpecified;
-        private Action<ICodeWriter> _getter;
-        private string _getterExpression;
-        private Action<ICodeWriter> _setter;
-        private string _setterExpression;
-        private string _value;
-        private string _safeValue;
+        private Action<ICodeWriter>? _getter;
+        private string? _getterExpression;
+        private Action<ICodeWriter>? _setter;
+        private string? _setterExpression;
+        private string? _value;
         private bool _getOnly;
         private bool _virtual;
         private bool _override;
         private Accessibility? _setterAccessibility;
         private readonly List<string> _attributes = new List<string>();
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
+        private DocumentationComment? _xmlDoc;
 
         internal PropertyBuilder(string name, Accessibility? accessModifier, ClassBuilder builder)
         {
@@ -40,7 +43,7 @@ namespace CodeGenHelpers
 
         public string Name { get; }
 
-        public string Type { get; private set; }
+        public string? Type { get; private set; }
 
         public ClassBuilder Class { get; }
 
@@ -50,22 +53,19 @@ namespace CodeGenHelpers
 
         public PropertyBuilder WithSummary(string summary)
         {
-            _xmlDoc.Summary = summary;
-            _xmlDoc.InheritDoc = false;
+            _xmlDoc = new SummaryDocumentationComment { Summary = summary };
             return this;
         }
 
         public PropertyBuilder WithInheritDoc(bool inherit = true)
         {
-            _xmlDoc.InheritDoc = inherit;
-            _xmlDoc.InheritFrom = null;
+            _xmlDoc = new InheritDocumentationComment();
             return this;
         }
 
         public PropertyBuilder WithInheritDoc(string from)
         {
-            _xmlDoc.InheritDoc = true;
-            _xmlDoc.InheritFrom = from;
+            _xmlDoc = new InheritDocumentationComment { InheritFrom = from };
             return this;
         }
 
@@ -121,7 +121,7 @@ namespace CodeGenHelpers
         
         public PropertyBuilder Override(bool @override = true)
         {
-            _override = true;
+            _override = @override;
             return this;
         }
 
@@ -188,40 +188,37 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder WithConstValue(string value, string safeValue = null, ValueType valueType = ValueType.UserSpecified)
+        public ClassBuilder WithConstValue(string value, ValueType valueType = ValueType.UserSpecified)
         {
             _value = value;
-            _safeValue = safeValue;
             FieldTypeValue = FieldType.Const;
             PropertyValueType = valueType;
             return Class;
         }
 
         public ClassBuilder WithReadonlyValue(ValueType valueType = ValueType.UserSpecified) =>
-            WithReadonlyValue(null, null, valueType);
+            WithReadonlyValue(null, valueType);
 
-        public ClassBuilder WithReadonlyValue(string value, string safeValue = null, ValueType valueType = ValueType.UserSpecified)
+        public ClassBuilder WithReadonlyValue(string? value, ValueType valueType = ValueType.UserSpecified)
         {
             _value = value;
-            _safeValue = safeValue;
             FieldTypeValue = FieldType.ReadOnly;
             PropertyValueType = valueType;
             return Class;
         }
 
-        public ClassBuilder WithValue(string value, string safeValue = null, ValueType valueType = ValueType.UserSpecified)
+        public ClassBuilder WithValue(string? value, ValueType valueType = ValueType.UserSpecified)
         {
             _value = value;
-            _safeValue = safeValue;
             FieldTypeValue = FieldType.Default;
             PropertyValueType = valueType;
             return Class;
         }
 
-        public ClassBuilder MakeBackingField(string defaultValue = null, string safeValue = null) =>
-            WithValue(defaultValue, safeValue);
+        public ClassBuilder MakeBackingField(string? defaultValue = null) =>
+            WithValue(defaultValue);
 
-        public PropertyBuilder WithBackingField(string defaultValue = null, Accessibility? accessModifier = null)
+        public PropertyBuilder WithBackingField(string? defaultValue = null, Accessibility? accessModifier = null)
         {
             var name = $"_{char.ToLower(Name[0])}{Name.Substring(1)}";
             var builder = Class.AddProperty(name, accessModifier ?? Accessibility.Private);
@@ -234,7 +231,7 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(writer);
+            _xmlDoc?.Write(writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
@@ -246,11 +243,14 @@ namespace CodeGenHelpers
                 _ => _value
             };
 
+            if (Type is null || string.IsNullOrEmpty(Type))
+                throw new ArgumentNullException($"There is no 'Type' Specified for {Name}");
+
             var type = Type.Trim();
             var name = Name.Trim();
             var _static = IsStatic ? " static" : null;
             var isNew = name == nameof(Equals) ? " new" : string.Empty;
-            string additionalModifier = null;
+            string? additionalModifier = null;
             if (_virtual)
                 additionalModifier = "virtual";
             else if (_override)
@@ -277,12 +277,12 @@ namespace CodeGenHelpers
                 {
                     writer.AppendLine($"{output} =");
                     writer.IncreaseIndent();
-                    writer.AppendLine($"{value};", $"{_safeValue ?? value};");
+                    writer.AppendLine($"{value};");
                     writer.DecreaseIndent();
                 }
                 else
                 {
-                    writer.AppendLine($"{output} = {value};", $"{output} = {_safeValue ?? value};");
+                    writer.AppendLine($"{output} = {value};");
                 }
 
                 return;

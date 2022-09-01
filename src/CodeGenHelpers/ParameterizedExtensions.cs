@@ -2,6 +2,10 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0008
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public static class ParameterizedExtensions
@@ -45,7 +49,7 @@ namespace CodeGenHelpers
             return parameterized.AddParameter(typeSymbol.Name, parameterName, index);
         }
 
-        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, string typeName, string parameterName = null, object defaultValue = null, int index = -1)
+        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, string typeName, string? parameterName = null, object? defaultValue = null, int index = -1)
             where T : BuilderBase<T>, IParameterized<T>
         {
             var parameter = GetParameter(parameterized.Parent, typeName, parameterName)
@@ -53,14 +57,14 @@ namespace CodeGenHelpers
             return parameterized.AddParameterInternal(parameter, index);
         }
 
-        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, ITypeSymbol typeSymbol, string parameterName = null, object defaultValue = null, int index = -1)
+        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, ITypeSymbol typeSymbol, string? parameterName = null, object? defaultValue = null, int index = -1)
             where T : BuilderBase<T>, IParameterized<T>
         {
             parameterized.Parent.AddNamespaceImport(typeSymbol);
             return parameterized.AddParameterWithDefaultValue(typeSymbol.Name, parameterName, defaultValue, index);
         }
 
-        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, string typeName, string parameterName = null, int index = -1)
+        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, string typeName, string? parameterName = null, int index = -1)
             where T : BuilderBase<T>, IParameterized<T>
         {
             var parameter = GetParameter(parameterized.Parent, typeName, parameterName)
@@ -68,14 +72,14 @@ namespace CodeGenHelpers
             return parameterized.AddParameterInternal(parameter, index);
         }
 
-        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, ITypeSymbol typeSymbol, string parameterName = null, int index = -1)
+        public static T AddParameterWithDefaultValue<T>(this IParameterized<T> parameterized, ITypeSymbol typeSymbol, string? parameterName = null, int index = -1)
             where T : BuilderBase<T>, IParameterized<T>
         {
             parameterized.Parent.AddNamespaceImport(typeSymbol);
             return parameterized.AddParameterWithDefaultValue(typeSymbol, parameterName, index);
         }
 
-        public static T AddParameterWithNullValue<T>(this IParameterized<T> parameterized, string typeName, string parameterName = null, int index = -1)
+        public static T AddParameterWithNullValue<T>(this IParameterized<T> parameterized, string typeName, string? parameterName = null, int index = -1)
             where T : BuilderBase<T>, IParameterized<T>
         {
             var parameter = GetParameter(parameterized.Parent, typeName, parameterName)
@@ -83,7 +87,7 @@ namespace CodeGenHelpers
             return parameterized.AddParameterInternal(parameter, index);
         }
 
-        public static T AddParameterWithNullValue<T>(this IParameterized<T> parameterized, ITypeSymbol typeSymbol, string parameterName = null, int index = -1)
+        public static T AddParameterWithNullValue<T>(this IParameterized<T> parameterized, ITypeSymbol typeSymbol, string? parameterName = null, int index = -1)
             where T : BuilderBase<T>, IParameterized<T>
         {
             parameterized.Parent.AddNamespaceImport(typeSymbol);
@@ -129,10 +133,10 @@ namespace CodeGenHelpers
             return parameterized.Parent;
         }
 
-        private static ParameterBuilder<T> GetParameter<T>(T parent, string typeName, string parameterName)
+        private static ParameterBuilder<T> GetParameter<T>(T parent, string typeName, string? parameterName)
             where T : BuilderBase<T>
         {
-            if (string.IsNullOrEmpty(parameterName))
+            if (parameterName is null || string.IsNullOrEmpty(parameterName))
             {
                 parameterName = char.ToLower(typeName[0]) + typeName.Substring(1);
             }

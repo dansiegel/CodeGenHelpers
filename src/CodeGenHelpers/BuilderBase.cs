@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+#pragma warning disable IDE0008
+#pragma warning disable IDE0090
+#nullable enable
 namespace CodeGenHelpers
 {
     public abstract class BuilderBase : IBuilder

@@ -1,12 +1,16 @@
 ﻿using System;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public sealed class SwitchCaseBuilder : IBuilder
     {
         private SwitchBuilder _parent { get; }
         private string _case { get; }
-        private Action<ICodeWriter> _content;
+        private Action<ICodeWriter>? _content;
 
         public SwitchCaseBuilder(SwitchBuilder parent, string @case)
         {

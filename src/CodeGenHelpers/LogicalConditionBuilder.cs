@@ -2,18 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public sealed class LogicalConditionBuilder
     {
         private ICodeWriter _writer { get; }
-        private string _condition { get; }
+        private string? _condition { get; }
         private string _operator { get; }
         private Queue<LogicalConditionBuilder> _builders { get; }
-        private Action<ICodeWriter> _innerWrite { get; set; }
-        private LogicalConditionBuilder _parent { get; }
+        private Action<ICodeWriter>? _innerWrite { get; set; }
+        private LogicalConditionBuilder? _parent { get; }
 
-        internal LogicalConditionBuilder(ICodeWriter writer, string condition, string @operator = "if", LogicalConditionBuilder parent = null)
+        internal LogicalConditionBuilder(ICodeWriter writer, string? condition, string @operator = "if", LogicalConditionBuilder? parent = null)
         {
             _writer = writer;
             _condition = condition;

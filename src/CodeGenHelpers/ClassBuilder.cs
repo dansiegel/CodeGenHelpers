@@ -5,6 +5,11 @@ using System.Text.RegularExpressions;
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0008
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public sealed class ClassBuilder : BuilderBase<ClassBuilder>
@@ -19,7 +24,7 @@ namespace CodeGenHelpers
         private readonly Queue<ClassBuilder> _nestedClass = new Queue<ClassBuilder>();
         private readonly GenericCollection _generics = new GenericCollection();
         private readonly bool _isPartial;
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
+        private DocumentationComment? _xmlDoc;
 
         internal ClassBuilder(string className, CodeBuilder codeBuilder, bool partial = true)
         {
@@ -42,7 +47,7 @@ namespace CodeGenHelpers
 
         public CodeBuilder Builder { get; }
 
-        public string BaseClass { get; private set; }
+        public string? BaseClass { get; private set; }
 
         public Accessibility? AccessModifier { get; private set; }
 
@@ -56,22 +61,19 @@ namespace CodeGenHelpers
 
         public ClassBuilder WithSummary(string summary)
         {
-            _xmlDoc.Summary = summary;
-            _xmlDoc.InheritDoc = false;
+            _xmlDoc = new SummaryDocumentationComment { Summary = summary };
             return this;
         }
 
         public ClassBuilder WithInheritDoc(bool inherit = true)
         {
-            _xmlDoc.InheritDoc = inherit;
-            _xmlDoc.InheritFrom = null;
+            _xmlDoc = new InheritDocumentationComment();
             return this;
         }
 
         public ClassBuilder WithInheritDoc(string from)
         {
-            _xmlDoc.InheritDoc = true;
-            _xmlDoc.InheritFrom = from;
+            _xmlDoc = new InheritDocumentationComment { InheritFrom = from };
             return this;
         }
 
@@ -280,11 +282,9 @@ namespace CodeGenHelpers
 
         public string Build() => Builder.Build();
 
-        public string BuildSafe() => Builder.BuildSafe();
-
         internal override void Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(writer);
+            _xmlDoc?.Write(writer);
 
             WriteClassAttributes(_classAttributes, writer);
 
@@ -293,7 +293,7 @@ namespace CodeGenHelpers
             var queue = new Queue<string>();
             if (!string.IsNullOrEmpty(BaseClass))
             {
-                queue.Enqueue(BaseClass);
+                queue.Enqueue(BaseClass!);
             }
 
             foreach (var inter in _interfaces.Where(x => !string.IsNullOrEmpty(x)).Distinct().OrderBy(x => x))
@@ -323,13 +323,41 @@ namespace CodeGenHelpers
             {
                 var hadOutput = false;
                 hadOutput = InvokeBuilderWrite(_events, ref hadOutput, writer);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false), ref hadOutput, writer, true);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == true), ref hadOutput, writer, true);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.ReadOnly), ref hadOutput, writer, true);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Default), ref hadOutput, writer, true);
-                hadOutput = InvokeBuilderWrite(_constructors, ref hadOutput, writer);
-                hadOutput = InvokeBuilderWrite(_properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Property), ref hadOutput, writer);
-                hadOutput = InvokeBuilderWrite(_methods, ref hadOutput, writer);
+                hadOutput = InvokeBuilderWrite(
+                    _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false)
+                        .OrderBy(x => x.Name),
+                    ref hadOutput,
+                    writer,
+                    true);
+                hadOutput = InvokeBuilderWrite(
+                    _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == true)
+                        .OrderBy(x => x.Name),
+                    ref hadOutput,
+                    writer,
+                    true);
+                hadOutput = InvokeBuilderWrite(
+                    _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.ReadOnly)
+                        .OrderBy(x => x.Name),
+                    ref hadOutput,
+                    writer,
+                    true);
+                hadOutput = InvokeBuilderWrite(
+                    _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Default)
+                        .OrderBy(x => x.Name),
+                    ref hadOutput,
+                    writer,
+                    true);
+                hadOutput = InvokeBuilderWrite(_constructors.OrderBy(x => x.Parameters.Count), ref hadOutput, writer);
+                hadOutput = InvokeBuilderWrite(
+                    _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Property)
+                        .OrderBy(x => x.Name),
+                    ref hadOutput,
+                    writer);
+                hadOutput = InvokeBuilderWrite(
+                    _methods.OrderBy(x => x.Name)
+                        .ThenBy(x => x.Parameters.Count),
+                    ref hadOutput,
+                    writer);
                 InvokeBuilderWrite(_nestedClass, ref hadOutput, writer);
             }
         }

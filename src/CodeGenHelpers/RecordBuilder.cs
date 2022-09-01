@@ -3,13 +3,17 @@ using System.Linq;
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public sealed class RecordBuilder : BuilderBase<RecordBuilder>
     {
         private readonly List<RecordPropertyBuilder> _properties = new List<RecordPropertyBuilder>();
         private readonly List<string> _attributes = new List<string>();
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
+        private DocumentationComment? _xmlDoc;
 
         internal RecordBuilder(string name, CodeBuilder codeBuilder)
         {
@@ -24,6 +28,25 @@ namespace CodeGenHelpers
         public Accessibility? AccessModifier { get; private set; }
 
         public RecordPropertyType PropertyType { get; private set; } = RecordPropertyType.Positional;
+
+        public RecordBuilder WithSummary(string summary)
+        {
+            _xmlDoc = new SummaryDocumentationComment { Summary = summary };
+
+            return this;
+        }
+
+        public RecordBuilder WithInheritDoc(bool inherit = true)
+        {
+            _xmlDoc = new InheritDocumentationComment();
+            return this;
+        }
+
+        public RecordBuilder WithInheritDoc(string from)
+        {
+            _xmlDoc = new InheritDocumentationComment { InheritFrom = from };
+            return this;
+        }
 
         public RecordBuilder UsePositionalProperties()
         {
@@ -58,7 +81,7 @@ namespace CodeGenHelpers
 
         internal override void Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(writer);
+            _xmlDoc?.Write(writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");

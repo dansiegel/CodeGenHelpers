@@ -1,5 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 
+#nullable enable
 namespace CodeGenHelpers
 {
     public abstract class BuilderBase<T> : BuilderBase
@@ -12,7 +14,10 @@ namespace CodeGenHelpers
         public T DisableWarning(string buildCode)
         {
             _pragmaWarnings.Add(buildCode);
-            return this as T;
+            if (this is T thisAsT)
+                return thisAsT;
+
+            throw new InvalidOperationException($"The Builder must be of type {typeof(T).FullName}");
         }
     }
 }

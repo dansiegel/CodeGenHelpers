@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers.Internals
 {
     internal static class CodeBuilderExtensions

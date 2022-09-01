@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public sealed class SwitchBuilder
@@ -28,8 +32,8 @@ namespace CodeGenHelpers
         {
             if (Expression)
                 WriterExpressionSwitchCase();
-            else
-                WriteClassicSwitchCase(_writer as CodeWriter);
+            else if(_writer is CodeWriter codeWriter)
+                WriteClassicSwitchCase(codeWriter);
             return _writer;
         }
 
