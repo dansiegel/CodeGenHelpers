@@ -1,4 +1,4 @@
-using Xunit;
+﻿using Xunit;
 using Xunit.Abstractions;
 
 namespace CodeGenHelpers.Tests
@@ -51,6 +51,16 @@ namespace CodeGenHelpers.Tests
                      .AddConstraint("IFoo")
                      .New();
                 });
+
+            MakeAssertion(builder);
+        }
+
+        [Fact]
+        public void GeneratesTopLevelNamespace()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .TopLevelNamespace()
+                .AddClass("TopLevelNamespace");
 
             MakeAssertion(builder);
         }

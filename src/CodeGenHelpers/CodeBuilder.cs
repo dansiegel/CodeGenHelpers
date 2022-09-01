@@ -20,6 +20,7 @@ the code is regenerated.";
         private readonly List<string> _namespaceImports = new List<string>();
         private readonly List<string> _assemblyAttributes = new List<string>();
         private readonly Queue<IBuilder> _classes = new Queue<IBuilder>();
+        private bool _topLevel;
         private NullableState _nullable = NullableState.Default;
 
         private CodeBuilder(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces)
@@ -36,6 +37,12 @@ the code is regenerated.";
         public IReadOnlyList<RecordBuilder> Records => _classes.OfType<RecordBuilder>().ToList();
 
         public IReadOnlyList<EnumBuilder> Enums => _classes.OfType<EnumBuilder>().ToList();
+
+        public CodeBuilder TopLevelNamespace()
+        {
+            _topLevel = true;
+            return this;
+        }
 
         public CodeBuilder Nullable() => Nullable(NullableState.Enable);
 
@@ -154,21 +161,34 @@ the code is regenerated.";
                 writer.AppendLine($"#nullable {_nullable}".ToLower());
 
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
+            if(_topLevel)
+            {
+                writer.AppendLine($"namespace {Namespace};");
+                writer.NewLine();
+                WriteBody(writer);
+                return writer;
+            }
+
             using (writer.Block($"namespace {Namespace}"))
             {
-                var clone = new Queue<IBuilder>(_classes);
-
-                while (clone.Any())
-                {
-                    var output = clone.Dequeue();
-                    output.Write(writer);
-
-                    if (clone.Any())
-                        writer.NewLine();
-                }
+                WriteBody(writer);
             }
 
             return writer;
+        }
+
+        private void WriteBody(CodeWriter writer)
+        {
+            var clone = new Queue<IBuilder>(_classes);
+
+            while (clone.Any())
+            {
+                var output = clone.Dequeue();
+                output.Write(writer);
+
+                if (clone.Any())
+                    writer.NewLine();
+            }
         }
 
         private static IEnumerable<string> GetImports(ref List<string> namespaces, Func<string, bool> predicate)
