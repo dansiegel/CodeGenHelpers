@@ -20,6 +20,7 @@ the code is regenerated.";
         private readonly List<string> _namespaceImports = new List<string>();
         private readonly List<string> _assemblyAttributes = new List<string>();
         private readonly Queue<IBuilder> _classes = new Queue<IBuilder>();
+        private NullableState _nullable = NullableState.Default;
 
         private CodeBuilder(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces)
         {
@@ -35,6 +36,14 @@ the code is regenerated.";
         public IReadOnlyList<RecordBuilder> Records => _classes.OfType<RecordBuilder>().ToList();
 
         public IReadOnlyList<EnumBuilder> Enums => _classes.OfType<EnumBuilder>().ToList();
+
+        public CodeBuilder Nullable() => Nullable(NullableState.Enable);
+
+        public CodeBuilder Nullable(NullableState nullable)
+        {
+            _nullable = nullable;
+            return this;
+        }
 
         public static CodeBuilder Create(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces) =>
             new CodeBuilder(clrNamespace, indentStyle);
@@ -140,6 +149,9 @@ the code is regenerated.";
 
             if(_namespaceImports.Count > 0)
                 writer.NewLine();
+
+            if(_nullable != NullableState.Default)
+                writer.AppendLine($"#nullable {_nullable}".ToLower());
 
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
             using (writer.Block($"namespace {Namespace}"))

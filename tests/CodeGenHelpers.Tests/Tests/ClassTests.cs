@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace CodeGenHelpers.Tests
@@ -51,6 +51,16 @@ namespace CodeGenHelpers.Tests
                      .AddConstraint("IFoo")
                      .New();
                 });
+
+            MakeAssertion(builder);
+        }
+
+        [Fact]
+        public void GeneratesNullableCodeFile()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .Nullable(NullableState.Enable)
+                .AddClass("NullableClass");
 
             MakeAssertion(builder);
         }
