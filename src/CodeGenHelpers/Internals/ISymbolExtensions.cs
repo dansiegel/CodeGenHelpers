@@ -5,6 +5,10 @@ using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0008
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers.Internals
 {
     internal static class ISymbolExtensions
@@ -25,6 +29,21 @@ namespace CodeGenHelpers.Internals
                 { "decimal",    typeof(decimal).ToString() },
                 { "bool",       typeof(bool).ToString()    },
             };
+
+        public static string GetGloballyQualifiedTypeName(this INamespaceOrTypeSymbol symbol)
+        {
+            var value = GetFullMetadataName(symbol);
+            if(_fullNamesMaping.Any(x => x.Value == value))
+            {
+                return _fullNamesMaping.First(x => x.Value == value).Key;
+            }
+            else if(_fullNamesMaping.Any(x => x.Value == $"System.Nullable`1[{value}]"))
+            {
+                return _fullNamesMaping.First(x => x.Value == $"System.Nullable`1[{value}]").Key + "?";
+            }
+
+            return value;
+        }
 
         public static string GetFullMetadataName(this INamespaceOrTypeSymbol symbol)
         {
@@ -67,28 +86,24 @@ namespace CodeGenHelpers.Internals
 
         private static bool IsRootNamespace(ISymbol s)
         {
-            return s is INamespaceSymbol && ((INamespaceSymbol)s).IsGlobalNamespace;
+            return s is INamespaceSymbol symbol && symbol.IsGlobalNamespace;
         }
 
         public static string GetFullName(this INamespaceOrTypeSymbol type)
         {
-            IArrayTypeSymbol arrayType = type as IArrayTypeSymbol;
-            if (arrayType != null)
+            if (type is IArrayTypeSymbol arrayType)
             {
                 return $"{arrayType.ElementType.GetFullName()}[]";
             }
 
-            ITypeSymbol t;
-            if ((type as ITypeSymbol).IsNullable(out t))
+            if (((ITypeSymbol)type).IsNullable(out var t) && t != null)
             {
                 return $"System.Nullable`1[{t.GetFullName()}]";
             }
 
-            var name = type.ToDisplayString();
+            var name = type.ToDisplayString() ?? string.Empty;
 
-            string output;
-
-            if (_fullNamesMaping.TryGetValue(name, out output))
+            if (!_fullNamesMaping.TryGetValue(name, out string output))
             {
                 output = name;
             }
@@ -102,7 +117,7 @@ namespace CodeGenHelpers.Internals
                 && type.OriginalDefinition.ToDisplayString().Equals("System.Nullable<T>", StringComparison.OrdinalIgnoreCase);
         }
 
-        public static bool IsNullable(this ITypeSymbol type, out ITypeSymbol nullableType)
+        public static bool IsNullable(this ITypeSymbol type, out ITypeSymbol? nullableType)
         {
             if (type.IsNullable())
             {

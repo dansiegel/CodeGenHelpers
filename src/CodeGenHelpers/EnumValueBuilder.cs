@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public class EnumValueBuilder : IBuilder
     {
         private readonly List<string> _attributes = new List<string>();
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
+        private DocumentationComment? _xmlDoc;
 
         internal EnumValueBuilder(string name, EnumBuilder builder, int? value)
         {
@@ -23,22 +27,19 @@ namespace CodeGenHelpers
 
         public EnumValueBuilder WithSummary(string summary)
         {
-            _xmlDoc.Summary = summary;
-            _xmlDoc.InheritDoc = false;
+            _xmlDoc = new SummaryDocumentationComment { Summary = summary };
             return this;
         }
 
         public EnumValueBuilder WithInheritDoc(bool inherit = true)
         {
-            _xmlDoc.InheritDoc = inherit;
-            _xmlDoc.InheritFrom = null;
+            _xmlDoc = new InheritDocumentationComment();
             return this;
         }
 
         public EnumValueBuilder WithInheritDoc(string from)
         {
-            _xmlDoc.InheritDoc = true;
-            _xmlDoc.InheritFrom = from;
+            _xmlDoc = new InheritDocumentationComment { InheritFrom = from };
             return this;
         }
 
@@ -58,7 +59,7 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(writer);
+            _xmlDoc?.Write(writer);
 
             foreach (var attr in _attributes.OrderBy(x => x))
             {

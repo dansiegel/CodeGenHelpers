@@ -1,6 +1,10 @@
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public class RecordPropertyBuilder
@@ -9,7 +13,7 @@ namespace CodeGenHelpers
         public string Name { get; }
         public RecordBuilder Record { get; }
         public bool HasDefaultValue { get; private set; }
-        public object DefaultValue { get; private set; }
+        public object? DefaultValue { get; private set; }
         public Accessibility? AccessModifier { get; private set; }
 
         public RecordPropertyBuilder(string type, string name, Accessibility accessModifier, RecordBuilder record)

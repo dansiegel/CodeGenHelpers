@@ -54,5 +54,25 @@ namespace CodeGenHelpers.Tests
 
             MakeAssertion(builder);
         }
+
+        [Fact]
+        public void GeneratesTopLevelNamespace()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .TopLevelNamespace()
+                .AddClass("TopLevelNamespace");
+
+            MakeAssertion(builder);
+        }
+
+        [Fact]
+        public void GeneratesNullableCodeFile()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .Nullable(NullableState.Enable)
+                .AddClass("NullableClass");
+
+            MakeAssertion(builder);
+        }
     }
 }

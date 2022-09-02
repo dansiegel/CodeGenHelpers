@@ -4,11 +4,11 @@ namespace CodeGenHelpers
 {
     public interface ICodeWriter
     {
-        void Append(string value, string safeValue = null);
-        void AppendUnindented(string value, string safeValue = null);
+        void Append(string value);
+        void AppendUnindented(string value);
         void NewLine();
-        void AppendLine(string value, string safeValue = null);
-        void AppendUnindentedLine(string value, string safeValue = null);
+        void AppendLine(string value);
+        void AppendUnindentedLine(string value);
         IDisposable Block(string value, params string[] constraints);
     }
 }

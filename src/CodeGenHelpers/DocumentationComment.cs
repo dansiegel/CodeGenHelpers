@@ -2,57 +2,69 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
-    internal class DocumentationComment
+    internal abstract class DocumentationComment
     {
-        internal DocumentationComment(bool supportsParameterDoc = false)
+        public abstract void Write(in CodeWriter writer);
+    }
+
+    internal class InheritDocumentationComment : DocumentationComment
+    {
+        internal string? InheritFrom { get; set; }
+
+        public override void Write(in CodeWriter writer)
         {
-            ParameterDoc = supportsParameterDoc
-                ? new Dictionary<string, string>()
-                : null;
+            writer.AppendLine($"/// <inheritdoc {(InheritFrom is null ? string.Empty : $"cref=\"{InheritFrom}\"")}/>");
         }
+    }
 
-        internal string Summary { get; set; }
+    internal class SummaryDocumentationComment : DocumentationComment
+    {
+        internal string? Summary { get; set; }
 
-        internal Dictionary<string, string> ParameterDoc { get; }
-
-        internal bool InheritDoc { get; set; }
-
-        internal string InheritFrom { get; set; }
-
-        internal void Write(in CodeWriter writer)
+        public override void Write(in CodeWriter writer)
         {
-            if (InheritDoc)
-            {
-                writer.AppendLine($"/// <inheritdoc {(InheritFrom is null ? string.Empty : $"cref=\"{InheritFrom}\"")}/>");
+            if (Summary is null || string.IsNullOrEmpty(Summary))
                 return;
-            }
 
-            if (Summary is {})
-            {
-                writer.AppendLine("/// <summary>");
+            writer.AppendLine("/// <summary>");
 
-                string[] lines = Summary.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                foreach (string line in lines)
-                    writer.AppendLine($"/// {line}");
+            string[] lines = Summary.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            foreach (string line in lines)
+                writer.AppendLine($"/// {line}");
 
-                writer.AppendLine("/// </summary>");
-            }
+            writer.AppendLine("/// </summary>");
+        }
+    }
 
-            if (ParameterDoc is {})
-            {
-                foreach (var param in ParameterDoc)
-                    writer.AppendLine($"/// <param name=\"{param.Key}\">{param.Value}</param>");
-            }
+    internal class ParameterDocumentationComment : SummaryDocumentationComment
+    {
+        private readonly Dictionary<string, string> parameterDocs = new Dictionary<string, string>();
+
+        public void AddParameter(string parameterName, string documentationComment)
+        {
+            parameterDocs[parameterName] = documentationComment;
         }
 
         internal void RemoveUnusedParameters<T>(List<ParameterBuilder<T>> parameters)
             where T : BuilderBase<T>, IParameterized<T>
         {
-            var unusedParameters = ParameterDoc.Where(p => !parameters.Any(x => x.Type == p.Key)).ToArray();
+            var unusedParameters = parameterDocs.Where(p =>
+                !parameters.Any(x => x.Type == p.Key)).ToArray();
             foreach (var parameter in unusedParameters)
-                ParameterDoc.Remove(parameter.Key);
+                parameterDocs.Remove(parameter.Key);
+        }
+
+        public override void Write(in CodeWriter writer)
+        {
+            base.Write(writer);
+            foreach (var param in parameterDocs.OrderBy(x => x.Key))
+                writer.AppendLine($"/// <param name=\"{param.Key}\">{param.Value}</param>");
         }
     }
 }

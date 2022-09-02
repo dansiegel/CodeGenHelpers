@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Text;
 
+#pragma warning disable IDE0008
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     internal class CodeWriter : IDisposable, ICodeWriter
@@ -10,7 +15,6 @@ namespace CodeGenHelpers
         private int _indentLevel = 0;
         private int _extraIndent = 0;
         private readonly StringBuilder _outputCode = new StringBuilder();
-        private readonly StringBuilder _safeCode = new StringBuilder();
 
         public CodeWriter(IndentStyle indentStyle)
         {
@@ -27,7 +31,7 @@ namespace CodeGenHelpers
 
         public IDisposable Block(string value, params string[] constraints)
         {
-            AppendLine(value?.TrimEnd());
+            AppendLine(value.TrimEnd());
             _indentLevel++;
             foreach (var constraint in constraints)
             {
@@ -43,34 +47,29 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public void Append(string value, string safeValue = null)
+        public void Append(string value)
         {
             _outputCode.Append(GetIndentedValue(value.TrimEnd()));
-            _safeCode.Append(GetIndentedValue(safeValue?.TrimEnd() ?? value.TrimEnd()));
         }
 
-        public void AppendUnindented(string value, string safeValue = null)
+        public void AppendUnindented(string value)
         {
             _outputCode.Append(value.TrimEnd());
-            _safeCode.Append(safeValue?.TrimEnd() ?? value.TrimEnd());
         }
 
         public void NewLine()
         {
             _outputCode.AppendLine();
-            _safeCode.AppendLine();
         }
 
-        public void AppendLine(string value, string safeValue = null)
+        public void AppendLine(string value)
         {
             _outputCode.AppendLine(GetIndentedValue(value.TrimEnd()));
-            _safeCode.AppendLine(GetIndentedValue(safeValue?.TrimEnd() ?? value.TrimEnd()));
         }
 
-        public void AppendUnindentedLine(string value, string safeValue = null)
+        public void AppendUnindentedLine(string value)
         {
             _outputCode.AppendLine(value.TrimEnd());
-            _safeCode.AppendLine(safeValue?.TrimEnd() ?? value.TrimEnd());
         }
 
         private string GetIndentedValue(string value)
@@ -88,11 +87,8 @@ namespace CodeGenHelpers
             {
                 _indentLevel--;
                 _outputCode.AppendLine(GetIndentedValue("}"));
-                _safeCode.AppendLine(GetIndentedValue("}"));
             }
         }
-
-        public string SafeOutput => _safeCode.ToString();
 
         public override string ToString()
         {

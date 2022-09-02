@@ -3,13 +3,17 @@ using System.Linq;
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public class EnumBuilder : IBuilder
     {
         private readonly List<string> _attributes = new List<string>();
         private readonly List<EnumValueBuilder> _values = new List<EnumValueBuilder>();
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment();
+        private DocumentationComment? _xmlDoc;
 
         internal EnumBuilder(string name, CodeBuilder builder)
         {
@@ -25,22 +29,19 @@ namespace CodeGenHelpers
 
         public EnumBuilder WithSummary(string summary)
         {
-            _xmlDoc.Summary = summary;
-            _xmlDoc.InheritDoc = false;
+            _xmlDoc = new SummaryDocumentationComment { Summary = summary };
             return this;
         }
 
         public EnumBuilder WithInheritDoc(bool inherit = true)
         {
-            _xmlDoc.InheritDoc = inherit;
-            _xmlDoc.InheritFrom = null;
+            _xmlDoc = new InheritDocumentationComment();
             return this;
         }
 
         public EnumBuilder WithInheritDoc(string from)
         {
-            _xmlDoc.InheritDoc = true;
-            _xmlDoc.InheritFrom = from;
+            _xmlDoc = new InheritDocumentationComment { InheritFrom = from };
             return this;
         }
 
@@ -90,7 +91,7 @@ namespace CodeGenHelpers
 
         void IBuilder.Write(in CodeWriter writer)
         {
-            _xmlDoc.Write(writer);
+            _xmlDoc?.Write(writer);
 
             var queue = new Queue<IBuilder>();
             _values.OrderBy(x => x.Value)

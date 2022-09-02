@@ -4,18 +4,22 @@ using System.Linq;
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0079
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public class MethodBuilder : BuilderBase<MethodBuilder>, IBuilder, IParameterized<MethodBuilder>
     {
         private readonly List<string> _attributes = new List<string>();
         private readonly GenericCollection _generics = new GenericCollection();
-        private readonly DocumentationComment _xmlDoc = new DocumentationComment(true);
+        private DocumentationComment? _xmlDoc;
         private readonly List<ParameterBuilder<MethodBuilder>> _parameters = new List<ParameterBuilder<MethodBuilder>>();
         private bool _override;
         private bool _virtual;
 
-        private Action<ICodeWriter> _methodBodyWriter;
+        private Action<ICodeWriter>? _methodBodyWriter;
 
         internal MethodBuilder(string name, Accessibility? accessModifier, ClassBuilder builder)
         {
@@ -31,7 +35,7 @@ namespace CodeGenHelpers
 
         public string Name { get; }
 
-        public string ReturnType { get; private set; }
+        public string? ReturnType { get; private set; }
 
         public bool IsAsync { get; private set; }
 
@@ -58,28 +62,36 @@ namespace CodeGenHelpers
 
         public MethodBuilder WithSummary(string summary)
         {
-            _xmlDoc.Summary = summary;
-            _xmlDoc.InheritDoc = false;
+            if (_xmlDoc is null || _xmlDoc is not SummaryDocumentationComment summaryDoc)
+                _xmlDoc = new ParameterDocumentationComment { Summary = summary };
+            else
+                summaryDoc.Summary = summary;
+
             return this;
         }
 
         public MethodBuilder WithInheritDoc(bool inherit = true)
         {
-            _xmlDoc.InheritDoc = inherit;
-            _xmlDoc.InheritFrom = null;
+            _xmlDoc = new InheritDocumentationComment();
             return this;
         }
 
         public MethodBuilder WithInheritDoc(string from)
         {
-            _xmlDoc.InheritDoc = true;
-            _xmlDoc.InheritFrom = from;
+            _xmlDoc = new InheritDocumentationComment { InheritFrom = from };
             return this;
         }
 
         public MethodBuilder WithParameterDoc(string paramName, string documentation)
         {
-            _xmlDoc.ParameterDoc[paramName] = documentation;
+            if (_xmlDoc is null)
+                _xmlDoc = new ParameterDocumentationComment();
+
+            if (_xmlDoc is not ParameterDocumentationComment parameterDoc)
+                throw new Exception("DocumentationComment has already been initialized with a non ParameterDocumentationComment");
+
+            parameterDoc.AddParameter(paramName, documentation);
+
             return this;
         }
 
@@ -195,7 +207,7 @@ namespace CodeGenHelpers
 
         internal override void Write(in CodeWriter writer)
         {
-            var output = string.IsNullOrEmpty(ReturnType) ? "void" : ReturnType.Trim();
+            var output = ReturnType is null || string.IsNullOrEmpty(ReturnType) ? "void" : ReturnType.Trim();
             if (IsAsync)
                 output = $"async {output}";
 
@@ -211,8 +223,10 @@ namespace CodeGenHelpers
             var parameters = string.Join(", ", _parameters.Select(x => x.ToString()));
             output = $"{AccessModifier.Code()} {output} {Name}{_generics}({parameters})";
 
-            _xmlDoc.RemoveUnusedParameters(_parameters);
-            _xmlDoc.Write(writer);
+            if(_xmlDoc is ParameterDocumentationComment parameterDocumentation)
+                parameterDocumentation.RemoveUnusedParameters(_parameters);
+
+            _xmlDoc?.Write(writer);
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");

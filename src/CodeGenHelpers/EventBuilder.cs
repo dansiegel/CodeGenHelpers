@@ -1,18 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
+#pragma warning disable IDE0008
+#pragma warning disable IDE0090
+#pragma warning disable IDE1006
+#nullable enable
 namespace CodeGenHelpers
 {
     public class EventBuilder : BuilderBase<EventBuilder>
     {
         private Accessibility _declaredAccessibility = Accessibility.Public;
-        private string _explicitImplementation = null;
+        private string? _explicitImplementation = null;
         private string _eventDelegateType = nameof(EventHandler);
-        private Action<ICodeWriter> _addHandlerDelegate = null;
-        private Action<ICodeWriter> _removeHandlerDelegate = null;
+        private Action<ICodeWriter>? _addHandlerDelegate = null;
+        private Action<ICodeWriter>? _removeHandlerDelegate = null;
         private bool _static = false;
 
         internal EventBuilder(ClassBuilder @class, string eventName)
@@ -80,9 +82,9 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder WithDefaultExplicitImplementation(string @interfaceName, Accessibility backingFieldAccessibility = Accessibility.Private, string backingFieldName = null)
+        public ClassBuilder WithDefaultExplicitImplementation(string @interfaceName, Accessibility backingFieldAccessibility = Accessibility.Private, string? backingFieldName = null)
         {
-            if (string.IsNullOrEmpty(backingFieldName))
+            if (backingFieldName is null || string.IsNullOrEmpty(backingFieldName))
                 backingFieldName = $"_{char.ToLower(Name[0])}{Name.Substring(1)}";
 
             return WithExplicitImplementation(interfaceName)
