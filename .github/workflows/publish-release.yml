@@ -7,7 +7,5 @@ on:
 jobs:
   publish-release:
     uses: avantipoint/workflow-templates/.github/workflows/deploy-nuget-from-release.yml@master
-    with:
-      artifacts: "Artifacts/*.nupkg"
     secrets:
       apiKey: ${{ secrets.NUGET_API_KEY }}

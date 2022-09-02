@@ -23,4 +23,5 @@ jobs:
     permissions:
       contents: write
     with:
+      artifacts: "Artifacts/*.nupkg"
       package-name: AvantiPoint.CodeGenHelpers
