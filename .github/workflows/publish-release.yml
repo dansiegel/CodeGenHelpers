@@ -10,3 +10,4 @@ jobs:
     secrets:
       apiKey: ${{ secrets.NUGET_API_KEY }}
       artifacts: "Artifacts/*.nupkg"
+      artifactErrorsFailBuild: false
