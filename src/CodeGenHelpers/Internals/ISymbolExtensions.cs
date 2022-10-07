@@ -113,6 +113,9 @@ namespace CodeGenHelpers.Internals
 
         public static bool IsNullable(this ITypeSymbol type)
         {
+            if (type.NullableAnnotation == NullableAnnotation.Annotated)
+                return true;
+            
             return ((type as INamedTypeSymbol)?.IsGenericType ?? false)
                 && type.OriginalDefinition.ToDisplayString().Equals("System.Nullable<T>", StringComparison.OrdinalIgnoreCase);
         }
@@ -121,7 +124,7 @@ namespace CodeGenHelpers.Internals
         {
             if (type.IsNullable())
             {
-                nullableType = ((INamedTypeSymbol)type).TypeArguments.First();
+                nullableType = type.NullableAnnotation == NullableAnnotation.Annotated ? type : ((INamedTypeSymbol)type).TypeArguments.First();
                 return true;
             }
             else
