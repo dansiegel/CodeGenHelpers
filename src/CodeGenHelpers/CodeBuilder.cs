@@ -203,7 +203,7 @@ the code is regenerated.";
         public string Build()
         {
             var writer = BuildInternal();
-            return writer.ToString();
+            return writer.Render();
         }
 
         public override string ToString()

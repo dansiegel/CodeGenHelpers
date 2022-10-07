@@ -10,5 +10,6 @@ namespace CodeGenHelpers
         void AppendLine(string value);
         void AppendUnindentedLine(string value);
         IDisposable Block(string value, params string[] constraints);
+        ICodeWriter BlockWriter(string originalLine);
     }
 }
