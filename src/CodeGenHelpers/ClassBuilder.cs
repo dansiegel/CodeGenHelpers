@@ -270,9 +270,12 @@ namespace CodeGenHelpers
             return this;
         }
 
-        public ClassBuilder AddNestedClass(string name, Accessibility? accessModifier = null)
+        public ClassBuilder AddNestedClass(string name, Accessibility? accessModifier = null) =>
+            AddNestedClass(name, false, accessModifier);
+
+        public ClassBuilder AddNestedClass(string name, bool partial, Accessibility? accessModifier = null)
         {
-            var builder = new ClassBuilder(name, Builder, false);
+            var builder = new ClassBuilder(name, Builder, partial);
             if (accessModifier.HasValue)
                 builder.WithAccessModifier(accessModifier.Value);
 
