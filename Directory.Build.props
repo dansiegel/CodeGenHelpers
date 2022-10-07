@@ -4,6 +4,7 @@
     <Owners>AvantiPoint</Owners>
     <Copyright>© Dan Siegel. All rights reserved.</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
    <!-- CI Helpers -->

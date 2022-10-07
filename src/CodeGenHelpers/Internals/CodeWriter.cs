@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 #pragma warning disable IDE0008
@@ -8,16 +10,18 @@ using System.Text;
 #nullable enable
 namespace CodeGenHelpers
 {
-    internal class CodeWriter : IDisposable, ICodeWriter
+    internal sealed class CodeWriter : IDisposable, ICodeWriter
     {
+        private readonly IndentStyle _indentStyle;
         private readonly string Indent;
 
         private int _indentLevel = 0;
         private int _extraIndent = 0;
-        private readonly StringBuilder _outputCode = new StringBuilder();
+        private readonly List<(StringBuilder? StringBuilder, CodeWriter? Writer)> _blocks = new();
 
-        public CodeWriter(IndentStyle indentStyle)
+        public CodeWriter(IndentStyle indentStyle, int startingLevel = 0)
         {
+            _indentStyle = indentStyle;
             Indent = indentStyle switch
             {
                 IndentStyle.Tabs => "\t",
@@ -47,29 +51,53 @@ namespace CodeGenHelpers
             return this;
         }
 
+        public ICodeWriter BlockWriter(string? originalLine)
+        {
+            var writer = new CodeWriter(_indentStyle, _indentLevel);
+            if (originalLine is { })
+            {
+                writer.AppendLine(originalLine);
+            }
+            writer.AppendLine("{");
+            writer._indentLevel++;
+            _blocks.Add((null, writer));
+            return writer;
+        }
+
+        private StringBuilder EnsureStringBuilder()
+        {
+            if (_blocks.LastOrDefault().StringBuilder is not { } sb)
+            {
+                sb = new StringBuilder();
+                _blocks.Add((sb, null));
+            }
+
+            return sb;
+        }
+
         public void Append(string value)
         {
-            _outputCode.Append(GetIndentedValue(value.TrimEnd()));
+            EnsureStringBuilder().Append(GetIndentedValue(value.TrimEnd()));
         }
 
         public void AppendUnindented(string value)
         {
-            _outputCode.Append(value.TrimEnd());
+            EnsureStringBuilder().Append(value.TrimEnd());
         }
 
         public void NewLine()
         {
-            _outputCode.AppendLine();
+            EnsureStringBuilder().AppendLine();
         }
 
         public void AppendLine(string value)
         {
-            _outputCode.AppendLine(GetIndentedValue(value.TrimEnd()));
+            EnsureStringBuilder().AppendLine(GetIndentedValue(value.TrimEnd()));
         }
 
         public void AppendUnindentedLine(string value)
         {
-            _outputCode.AppendLine(value.TrimEnd());
+            EnsureStringBuilder().AppendLine(value.TrimEnd());
         }
 
         private string GetIndentedValue(string value)
@@ -83,19 +111,34 @@ namespace CodeGenHelpers
 
         public void Dispose()
         {
-            if (_indentLevel > 0)
+            while (_indentLevel > 0)
             {
                 _indentLevel--;
-                _outputCode.AppendLine(GetIndentedValue("}"));
+                EnsureStringBuilder().AppendLine(GetIndentedValue("}"));
             }
         }
 
-        public override string ToString()
+        public string Render()
         {
-            while (_indentLevel > 0)
-                Dispose();
+            var result = new StringBuilder();
 
-            return _outputCode.ToString();
+            foreach (var block in _blocks)
+            {
+                if (block.StringBuilder is { })
+                {
+                    result.Append(block.StringBuilder);
+                }
+
+                if (block.Writer is { })
+                {
+                    block.Writer.Dispose();
+                    result.Append(block.Writer.Render());
+                }
+            }
+
+            Dispose();
+
+            return result.ToString();
         }
     }
 }
