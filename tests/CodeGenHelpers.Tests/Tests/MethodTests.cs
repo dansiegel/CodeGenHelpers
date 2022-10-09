@@ -35,5 +35,20 @@ namespace CodeGenHelpers.Tests
 
             MakeAssertion(builder);
         }
+
+        [Fact]
+        public void GenerateMultipleMethodsInClass()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .AddClass("MultipleMethodClass")
+                .AddMethod("Foo")
+                .MakePublicMethod()
+                .Class
+                .AddMethod("Bar")
+                .MakePublicMethod()
+                .Class;
+
+            MakeAssertion(builder);
+        }
     }
 }

@@ -29,4 +29,20 @@ public class CodeWriterTests
         var r = sut.Render();
         Assert.Equal(expected, r);
     }
+
+    [Fact]
+    public void GenerateIfElse()
+    {
+        var writer = new CodeWriter(IndentStyle.Tabs);
+
+        writer.If("true")
+            .WithBody(w => w.AppendLine("CrashTheSystem();"))
+            .Else()
+            .WithBody(w => w.AppendLine("DontCrashTheSystem();"))
+            .EndIf();
+
+        const string expected = "if (true)\r\n{\r\n\tCrashTheSystem();\r\n}\r\nelse\r\n{\r\n\tDontCrashTheSystem();\r\n}\r\n";
+        var r = writer.Render();
+        Assert.Equal(expected, r);
+    }
 }
