@@ -111,7 +111,7 @@ namespace CodeGenHelpers
 
         public void Dispose()
         {
-            while (_indentLevel > 0)
+            if (_indentLevel > 0)
             {
                 _indentLevel--;
                 EnsureStringBuilder().AppendLine(GetIndentedValue("}"));
