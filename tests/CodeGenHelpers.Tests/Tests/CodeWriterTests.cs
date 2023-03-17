@@ -1,9 +1,12 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace CodeGenHelpers.Tests;
 
 public class CodeWriterTests
 {
+    private static readonly string NewLine = Environment.NewLine;
+    
     [Fact]
     public void GenerateCodeWriter()
     {
@@ -25,7 +28,14 @@ public class CodeWriterTests
         ifBlock.AppendLine("CrashTheSystem();");
         elseBlock.AppendLine("DontCrashTheSystem();");
 
-        const string expected = "if (true)\r\n{\r\n\tCrashTheSystem();\r\n}\r\nelse\r\n{\r\n\tDontCrashTheSystem();\r\n}\r\n";
+        var expected = "if (true)" + NewLine +
+                       "{" + NewLine +
+                       "\tCrashTheSystem();" + NewLine +
+                       "}" + NewLine +
+                       "else" + NewLine +
+                       "{" + NewLine +
+                       "\tDontCrashTheSystem();" + NewLine +
+                       "}" + NewLine;
         var r = sut.Render();
         Assert.Equal(expected, r);
     }
@@ -41,7 +51,14 @@ public class CodeWriterTests
             .WithBody(w => w.AppendLine("DontCrashTheSystem();"))
             .EndIf();
 
-        const string expected = "if (true)\r\n{\r\n\tCrashTheSystem();\r\n}\r\nelse\r\n{\r\n\tDontCrashTheSystem();\r\n}\r\n";
+        var expected = "if (true)" + NewLine +
+                       "{" + NewLine +
+                       "\tCrashTheSystem();" + NewLine +
+                       "}" + NewLine +
+                       "else" + NewLine +
+                       "{" + NewLine +
+                       "\tDontCrashTheSystem();" + NewLine +
+                       "}" + NewLine;
         var r = writer.Render();
         Assert.Equal(expected, r);
     }
