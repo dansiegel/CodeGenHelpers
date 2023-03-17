@@ -74,5 +74,14 @@ namespace CodeGenHelpers.Tests
 
             MakeAssertion(builder);
         }
+
+        [Fact]
+        public void GeneratesClassInGlobalNamespace()
+        {
+            var builder = CodeBuilder.CreateInGlobalNamespace()
+                .AddClass("ClassInGlobalNamespace");
+
+            MakeAssertion(builder);
+        }
     }
 }
