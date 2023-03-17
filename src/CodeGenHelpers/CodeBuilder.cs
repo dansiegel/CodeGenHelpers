@@ -23,13 +23,13 @@ the code is regenerated.";
         private bool _topLevel;
         private NullableState _nullable = NullableState.Default;
 
-        private CodeBuilder(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces)
+        private CodeBuilder(string? clrNamespace = null, IndentStyle indentStyle = IndentStyle.Spaces)
         {
             Namespace = clrNamespace;
             IndentStyle = indentStyle;
         }
 
-        public string Namespace { get; }
+        public string? Namespace { get; }
 
         public IndentStyle IndentStyle { get; }
 
@@ -52,6 +52,10 @@ the code is regenerated.";
             return this;
         }
 
+        public static CodeBuilder CreateInGlobalNamespace(IndentStyle indentStyle = IndentStyle.Spaces) =>
+            new CodeBuilder(indentStyle: indentStyle)
+                .TopLevelNamespace();
+        
         public static CodeBuilder Create(string clrNamespace, IndentStyle indentStyle = IndentStyle.Spaces) =>
             new CodeBuilder(clrNamespace, indentStyle);
 
@@ -163,8 +167,12 @@ the code is regenerated.";
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
             if(_topLevel)
             {
-                writer.AppendLine($"namespace {Namespace};");
-                writer.NewLine();
+                if (Namespace is not null)
+                {
+                    writer.AppendLine($"namespace {Namespace};");
+                    writer.NewLine();
+                }
+
                 WriteBody(writer);
                 return writer;
             }
