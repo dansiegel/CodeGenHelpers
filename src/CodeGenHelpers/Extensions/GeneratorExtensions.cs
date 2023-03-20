@@ -1,7 +1,7 @@
 ﻿using CodeGenHelpers;
 using Microsoft.CodeAnalysis;
 
-namespace AvantiPoint.CodeGenHelpers.Extensions;
+namespace CodeGenHelpers.Extensions;
 
 public static class GeneratorExtensions
 {
