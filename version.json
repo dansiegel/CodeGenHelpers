@@ -1,6 +1,7 @@
 {
   "$schema": "https://github.com/dotnet/Nerdbank.GitVersioning/raw/main/src/NerdBank.GitVersioning/version.schema.json",
-  "version": "1.6",
+  "version": "2.0-pre",
+  "buildNumberOffset": 3,
   "assemblyVersion": {
     "precision": "revision"
   },
