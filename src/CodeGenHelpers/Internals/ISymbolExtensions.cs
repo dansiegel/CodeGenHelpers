@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AvantiPoint.CodeGenHelpers.Extensions;
 using Microsoft.CodeAnalysis;
 
 #pragma warning disable IDE0008
@@ -109,29 +110,6 @@ namespace CodeGenHelpers.Internals
             }
 
             return output;
-        }
-
-        public static bool IsNullable(this ITypeSymbol type)
-        {
-            if (type.NullableAnnotation == NullableAnnotation.Annotated)
-                return true;
-            
-            return ((type as INamedTypeSymbol)?.IsGenericType ?? false)
-                && type.OriginalDefinition.ToDisplayString().Equals("System.Nullable<T>", StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static bool IsNullable(this ITypeSymbol type, out ITypeSymbol? nullableType)
-        {
-            if (type.IsNullable())
-            {
-                nullableType = type.NullableAnnotation == NullableAnnotation.Annotated ? type : ((INamedTypeSymbol)type).TypeArguments.First();
-                return true;
-            }
-            else
-            {
-                nullableType = null;
-                return false;
-            }
         }
     }
 }
