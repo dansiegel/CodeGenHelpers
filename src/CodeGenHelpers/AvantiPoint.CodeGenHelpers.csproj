@@ -10,9 +10,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>latest</LangVersion>
 
-    <DevelopmentDependency>true</DevelopmentDependency>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddGeneratorsToOutput</TargetsForTfmSpecificContentInPackage>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);NU5128;</NoWarn>
   </PropertyGroup>
@@ -20,14 +17,6 @@
   <ItemGroup>
     <InternalsVisibleTo Include="CodeGenHelpers.Tests" />
     <None Update="ReadMe.txt" Pack="true" PackagePath="" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
-    <None Include="AvantiPoint.CodeGenHelpers.props" Pack="true" PackagePath="build" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
   </ItemGroup>
-
-  <Target Name="_AddGeneratorsToOutput">
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="*.cs" PackagePath="build/content" />
-      <TfmSpecificPackageFile Include="Internals\*.cs" PackagePath="build/content/Internals" />
-    </ItemGroup>
-  </Target>
 </Project>
