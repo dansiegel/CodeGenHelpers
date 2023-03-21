@@ -1,11 +1,12 @@
-﻿using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using System.Linq;
+using System.Text;
+using CodeGenHelpers;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
-namespace CodeGenHelpers.Extensions;
+namespace Microsoft.CodeAnalysis;
 
-public static class GeneratorExtensions
+public static class CodeHelpersGeneratorExtensions
 {
     /// <summary>
     /// This will add the source using the Fully Qualified Type name and will apply basic formatting based on the
@@ -19,7 +20,23 @@ public static class GeneratorExtensions
         if (string.IsNullOrEmpty(builder.Namespace) || builder.Namespace is null)
             return;
 
-        foreach(var @class in builder.Classes)
+        if(builder.Classes.Count == 1 && builder.Enums.Count == 0 && builder.Records.Count == 0)
+        {
+            context.AddSource(builder.Classes.First());
+            return;
+        }
+        else if (builder.Classes.Count == 0 && builder.Enums.Count == 1 && builder.Records.Count == 0)
+        {
+            context.AddSource(builder.Enums.First());
+            return;
+        }
+        else if (builder.Classes.Count == 0 && builder.Enums.Count == 0 && builder.Records.Count == 1)
+        {
+            context.AddSource(builder.Records.First());
+            return;
+        }
+
+        foreach (var @class in builder.Classes)
         {
             context.AddSource(CodeBuilder.Create(builder.Namespace)
                 .AddClass(@class));
@@ -119,15 +136,22 @@ public static class GeneratorExtensions
     {
         if (options is CSharpParseOptions parseOptions)
         {
-            if (parseOptions.SpecifiedLanguageVersion >= LanguageVersion.CSharp10)
-                builder.TopLevelNamespace();
+            ConfigureFromOptions(builder, parseOptions);
 
             var source = builder.Build();
-            var syntaxTree = CSharpSyntaxTree.ParseText(Microsoft.CodeAnalysis.Text.SourceText.From(source, Encoding.UTF8), parseOptions);
+            var syntaxTree = CSharpSyntaxTree.ParseText(Text.SourceText.From(source, Encoding.UTF8), parseOptions);
             var formattedRoot = (CSharpSyntaxNode)syntaxTree.GetRoot().NormalizeWhitespace();
-            return Microsoft.CodeAnalysis.Text.SourceText.From(CSharpSyntaxTree.Create(formattedRoot).ToString(), Encoding.UTF8);
+            return Text.SourceText.From(CSharpSyntaxTree.Create(formattedRoot).ToString(), Encoding.UTF8);
         }
 
-        return Microsoft.CodeAnalysis.Text.SourceText.From(builder.Build(), Encoding.UTF8);
+        return Text.SourceText.From(builder.Build(), Encoding.UTF8);
+    }
+
+    private static void ConfigureFromOptions(CodeBuilder builder, CSharpParseOptions options)
+    {
+        if (options.SpecifiedLanguageVersion >= LanguageVersion.CSharp10)
+        {
+            builder.TopLevelNamespace();
+        }
     }
 }
