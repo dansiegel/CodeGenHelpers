@@ -45,7 +45,7 @@ namespace CodeGenHelpers
 
         public IReadOnlyList<ClassBuilder> NestedClasses => _nestedClass.ToList();
 
-        public CodeBuilder Builder { get; }
+        public CodeBuilder Builder { get; internal set; }
 
         public string? BaseClass { get; private set; }
 

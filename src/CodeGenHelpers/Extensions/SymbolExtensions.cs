@@ -3,11 +3,11 @@ using System.Linq;
 using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
-namespace AvantiPoint.CodeGenHelpers.Extensions;
+namespace CodeGenHelpers.Extensions;
 
 public static class SymbolExtensions
 {
-    public static string GetQualifiedTypeName(ITypeSymbol typeSymbol)
+    public static string GetQualifiedTypeName(this ITypeSymbol typeSymbol)
     {
         var type = typeSymbol.GetTypeName();
         if (!type.Contains(".") || typeSymbol is not INamedTypeSymbol namedTypeSymbol)

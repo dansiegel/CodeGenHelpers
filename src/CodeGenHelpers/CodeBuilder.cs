@@ -107,6 +107,13 @@ the code is regenerated.";
             return AddClass(symbol.Name);
         }
 
+        internal ClassBuilder AddClass(ClassBuilder builder)
+        {
+            _classes.Enqueue(builder);
+            builder.Builder = this;
+            return builder;
+        }
+
         public RecordBuilder AddRecord(string name)
         {
             var builder = new RecordBuilder(name, this);
@@ -114,10 +121,24 @@ the code is regenerated.";
             return builder;
         }
 
+        internal RecordBuilder AddRecord(RecordBuilder builder)
+        {
+            _classes.Enqueue(builder);
+            builder.Builder = this;
+            return builder;
+        }
+
         public EnumBuilder AddEnum(string name)
         {
             var builder = new EnumBuilder(name, this);
             _classes.Enqueue(builder);
+            return builder;
+        }
+
+        internal EnumBuilder AddEnum(EnumBuilder builder)
+        {
+            _classes.Enqueue(builder);
+            builder.Builder = this;
             return builder;
         }
 

@@ -21,9 +21,11 @@ namespace CodeGenHelpers
             Builder = builder;
         }
 
-        public CodeBuilder Builder { get; }
+        public CodeBuilder Builder { get; internal set; }
 
         public string Name { get; }
+
+        public string FullyQualifiedName => $"{Builder.Namespace}.{Name}";
 
         public Accessibility? AccessModifier { get; private set; }
 
@@ -88,6 +90,8 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             return this;
         }
+
+        public string Build() => Builder.Build();
 
         void IBuilder.Write(in CodeWriter writer)
         {

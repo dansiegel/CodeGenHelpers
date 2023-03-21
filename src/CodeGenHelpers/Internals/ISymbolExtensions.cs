@@ -1,9 +1,8 @@
-﻿#if !DISABLE_CODEGENHELPERS_SYMBOLEXTENSIONS
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AvantiPoint.CodeGenHelpers.Extensions;
+using CodeGenHelpers.Extensions;
 using Microsoft.CodeAnalysis;
 
 #pragma warning disable IDE0008
@@ -113,4 +112,3 @@ namespace CodeGenHelpers.Internals
         }
     }
 }
-#endif
