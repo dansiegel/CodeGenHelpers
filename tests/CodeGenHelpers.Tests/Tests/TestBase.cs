@@ -32,6 +32,11 @@ namespace CodeGenHelpers.Tests
             MakeAssertion(builder.Name, builder.Builder.Build());
         }
 
+        protected void MakeAssertion(DelegateBuilder builder)
+        {
+            MakeAssertion(builder.Name, builder.Builder.Build());
+        }
+
         protected void MakeAssertion(CodeBuilder builder, string fileName)
         {
             MakeAssertion(fileName, builder.Build());

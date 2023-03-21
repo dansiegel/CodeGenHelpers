@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CodeGenHelpers.Internals;
 using Microsoft.CodeAnalysis;
 
 #pragma warning disable IDE0079
@@ -201,7 +202,7 @@ namespace CodeGenHelpers
             var modifier = AccessModifier switch
             {
                 null => Class.AccessModifier.ToString().ToLower(),
-                _ => AccessModifier.ToString().ToLower()
+                _ => AccessModifier.Code()
             };
             var parameters = _parameters.Any() ? string.Join(", ", _parameters.Select(x => x.ToString())) : string.Empty;
             using(writer.Block($"{modifier} {Class.Name}({parameters})", _baseCall.Invoke()))

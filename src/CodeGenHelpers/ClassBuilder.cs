@@ -22,6 +22,7 @@ namespace CodeGenHelpers
         private readonly List<PropertyBuilder> _properties = new List<PropertyBuilder>();
         private readonly List<MethodBuilder> _methods = new List<MethodBuilder>();
         private readonly Queue<ClassBuilder> _nestedClass = new Queue<ClassBuilder>();
+        private readonly Queue<DelegateBuilder> _nestedDelegates = new Queue<DelegateBuilder>();
         private readonly GenericCollection _generics = new GenericCollection();
         private readonly bool _isPartial;
         private DocumentationComment? _xmlDoc;
@@ -283,6 +284,16 @@ namespace CodeGenHelpers
             return builder;
         }
 
+        public DelegateBuilder AddNestedDelegate(string name, Accessibility? accessModifier = null)
+        {
+            var builder = new DelegateBuilder(name, Builder);
+            if (accessModifier.HasValue)
+                builder.WithAccessModifier(accessModifier.Value);
+
+            _nestedDelegates.Enqueue(builder);
+            return builder;
+        }
+
         public string Build() => Builder.Build();
 
         internal override void Write(in CodeWriter writer)
@@ -328,6 +339,7 @@ namespace CodeGenHelpers
             using (writer.Block(string.Join(" ", classDeclaration.Where(x => !string.IsNullOrEmpty(x))), _generics.Contraints()))
             {
                 var hadOutput = false;
+                hadOutput = InvokeBuilderWrite(_nestedDelegates, ref hadOutput, in writer);
                 hadOutput = InvokeBuilderWrite(_events, ref hadOutput, writer);
                 hadOutput = InvokeBuilderWrite(
                     _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false)
