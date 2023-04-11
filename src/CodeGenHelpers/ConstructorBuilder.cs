@@ -139,14 +139,20 @@ namespace CodeGenHelpers
 
         public ConstructorBuilder WithBaseCall(Dictionary<string, string> parameters)
         {
+            WithBaseCall(parameters.Select(f => (f.Value, f.Key)));
+            return this;
+        }
+
+        public ConstructorBuilder WithBaseCall(IEnumerable<(string Type, string Name)> parameters)
+        {
             foreach (var parameter in parameters)
             {
-                this.AddParameter(parameter.Key, parameter.Value);
+                this.AddParameter(parameter.Type, parameter.Name);
             }
 
             _baseCall = () =>
             {
-                var output = parameters.Select(x => x.Value);
+                var output = parameters.Select(x => x.Name);
                 return $": base({string.Join(", ", output)})";
             };
             return this;
