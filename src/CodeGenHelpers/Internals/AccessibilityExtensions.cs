@@ -8,7 +8,7 @@ namespace CodeGenHelpers.Internals
         public static string? Code(this Accessibility accessModifier) =>
             accessModifier switch
             {
-                Accessibility.ProtectedAndInternal => "protected internal",
+                Accessibility.ProtectedAndInternal => "private protected",
                 Accessibility.ProtectedOrInternal => "protected internal",
                 Accessibility.NotApplicable => null,
                 _ => accessModifier.ToString().ToLower()
