@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Microsoft.CodeAnalysis;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace CodeGenHelpers.Tests
@@ -80,6 +81,36 @@ namespace CodeGenHelpers.Tests
         {
             var builder = CodeBuilder.CreateInGlobalNamespace()
                 .AddClass("ClassInGlobalNamespace");
+
+            MakeAssertion(builder);
+        }
+
+        [Fact]
+        public void SampleClassWithPropertiesSorted()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .AddClass("SampleClassWithPropertiesSorted");
+
+            builder.AddProperty("PropC", Accessibility.Public).SetType<string>();
+            builder.AddProperty("PropB", Accessibility.Public).SetType<string>();
+            builder.AddProperty("PropA", Accessibility.Public).SetType<string>();
+
+            MakeAssertion(builder);
+        }
+
+        [Fact]
+        public void SampleClassWithPropertiesNotSorted()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .AddClass("SampleClassWithPropertiesNotSorted");
+
+            builder.AddProperty("PropZ", Accessibility.Public).SetType<string>();
+            builder.AddProperty("PropC", Accessibility.Public).SetType<string>();
+            builder.AddProperty("PropB", Accessibility.Public).SetType<string>();
+            builder.AddProperty("PropA", Accessibility.Public).SetType<string>();
+            builder.AddProperty("PropD", Accessibility.Public).SetType<string>();
+
+            builder.DontSortPropertiesByName();
 
             MakeAssertion(builder);
         }

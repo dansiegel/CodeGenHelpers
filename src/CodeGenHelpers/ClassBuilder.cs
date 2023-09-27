@@ -26,6 +26,7 @@ namespace CodeGenHelpers
         private readonly GenericCollection _generics = new GenericCollection();
         private readonly bool _isPartial;
         private DocumentationComment? _xmlDoc;
+        private Func<PropertyBuilder, string>? _propertiesOrderBy = null;
 
         internal ClassBuilder(string className, CodeBuilder codeBuilder, bool partial = true)
         {
@@ -296,6 +297,12 @@ namespace CodeGenHelpers
 
         public string Build() => Builder.Build();
 
+        public ClassBuilder DontSortPropertiesByName()
+        {
+            _propertiesOrderBy = _ => "";
+            return this;
+        }
+
         internal override void Write(in CodeWriter writer)
         {
             _xmlDoc?.Write(writer);
@@ -341,34 +348,35 @@ namespace CodeGenHelpers
                 var hadOutput = false;
                 hadOutput = InvokeBuilderWrite(_nestedDelegates, ref hadOutput, in writer);
                 hadOutput = InvokeBuilderWrite(_events, ref hadOutput, writer);
+                var orderBy = _propertiesOrderBy ?? (x => x.Name);
                 hadOutput = InvokeBuilderWrite(
                     _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == false)
-                        .OrderBy(x => x.Name),
+                        .OrderBy(orderBy),
                     ref hadOutput,
                     writer,
                     true);
                 hadOutput = InvokeBuilderWrite(
                     _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Const && x.IsStatic == true)
-                        .OrderBy(x => x.Name),
+                        .OrderBy(orderBy),
                     ref hadOutput,
                     writer,
                     true);
                 hadOutput = InvokeBuilderWrite(
                     _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.ReadOnly)
-                        .OrderBy(x => x.Name),
+                        .OrderBy(orderBy),
                     ref hadOutput,
                     writer,
                     true);
                 hadOutput = InvokeBuilderWrite(
                     _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Default)
-                        .OrderBy(x => x.Name),
+                        .OrderBy(orderBy),
                     ref hadOutput,
                     writer,
                     true);
                 hadOutput = InvokeBuilderWrite(_constructors.OrderBy(x => x.Parameters.Count), ref hadOutput, writer);
                 hadOutput = InvokeBuilderWrite(
                     _properties.Where(x => x.FieldTypeValue == PropertyBuilder.FieldType.Property)
-                        .OrderBy(x => x.Name),
+                        .OrderBy(orderBy),
                     ref hadOutput,
                     writer);
                 hadOutput = InvokeBuilderWrite(
