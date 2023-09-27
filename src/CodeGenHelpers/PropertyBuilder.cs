@@ -27,6 +27,7 @@ namespace CodeGenHelpers
         private Action<ICodeWriter>? _setter;
         private string? _setterExpression;
         private string? _value;
+        private string? _warning;
         private bool _getOnly;
         private bool _virtual;
         private bool _override;
@@ -105,6 +106,12 @@ namespace CodeGenHelpers
 
         public PropertyBuilder SetType<T>() => SetType(typeof(T));
 
+        public PropertyBuilder SetWarning(string warning)
+        {
+            _warning = warning;
+            return this;
+        }
+
         public PropertyBuilder MakePublicProperty() => WithAccessModifier(Accessibility.Public);
 
         public PropertyBuilder MakePrivateProperty() => WithAccessModifier(Accessibility.Private);
@@ -118,7 +125,6 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             return this;
         }
-        
         public PropertyBuilder Override(bool @override = true)
         {
             _override = @override;
@@ -233,6 +239,11 @@ namespace CodeGenHelpers
         {
             _xmlDoc?.Write(writer);
 
+            if (_warning is not null)
+            {
+                writer.AppendLine("#warning " + _warning);
+            }
+
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
 
@@ -260,7 +271,7 @@ namespace CodeGenHelpers
             {
                 FieldType.Const => $"{AccessModifier.Code()}{isNew} const {type} {name}",
                 FieldType.ReadOnly => $"{AccessModifier.Code()}{isNew}{_static} readonly {type} {name}",
-                _ => additionalModifier is null 
+                _ => additionalModifier is null
                     ? $"{AccessModifier.Code()}{isNew}{_static} {type} {name}"
                     : $"{AccessModifier.Code()} {additionalModifier} {type} {name}"
             }).Trim();
