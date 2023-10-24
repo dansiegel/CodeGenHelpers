@@ -114,5 +114,15 @@ namespace CodeGenHelpers.Tests
 
             MakeAssertion(builder);
         }
+
+        [Fact]
+        public void AddsWarning()
+        {
+              var builder = CodeBuilder.Create(Namespace)
+                .AddClass("ClassWithWarning")
+                .SetWarning("boo");
+
+            MakeAssertion(builder);
+        }
     }
 }
