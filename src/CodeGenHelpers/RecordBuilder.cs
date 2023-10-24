@@ -87,6 +87,11 @@ namespace CodeGenHelpers
         {
             _xmlDoc?.Write(writer);
 
+            if (Warning is not null)
+            {
+                writer.AppendLine("#warning " + Warning);
+            }
+
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");
 

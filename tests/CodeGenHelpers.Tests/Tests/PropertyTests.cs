@@ -174,6 +174,29 @@ namespace CodeGenHelpers.Tests
             AreEqual(expected, builder);
         }
 
+        [Fact]
+        public void AddsWarning()
+        {
+            var builder = CodeBuilder.Create("AwesomeApp")
+                .AddClass("SampleClass");
+
+            builder.AddProperty("Foo")
+                .SetWarning("boo")
+                .SetType("string");
+
+            var expected = @"namespace AwesomeApp
+{
+    partial class SampleClass
+    {
+        #warning boo
+        string Foo;
+    }
+}
+";
+
+            AreEqual(expected, builder);
+        }
+
         private void AreEqual(string expected, ClassBuilder builder)
         {
             var expectedOutput = $@"//------------------------------------------------------------------------------

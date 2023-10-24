@@ -2,3 +2,5 @@
 [oO]bj/
 .vs/
 Artifacts/
+.idea/
+*DotSettings.user
