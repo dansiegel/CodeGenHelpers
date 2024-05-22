@@ -174,6 +174,52 @@ namespace CodeGenHelpers.Tests
             AreEqual(expected, builder);
         }
 
+        [Fact]
+        public void AddsGetterExpressionToStaticProperty()
+        {
+            var builder = CodeBuilder.Create("AwesomeApp")
+                .AddClass("SampleClass")
+                .AddProperty("Test")
+                .MakePublicProperty()
+                .MakeStatic()
+                .SetType("string")
+                .WithGetterExpression("\"test\"")
+                .Class;
+
+            var expected = @"namespace AwesomeApp
+{
+    partial class SampleClass
+    {
+        public static string Test => ""test"";
+    }
+}
+";
+            AreEqual(expected, builder);
+        }
+
+        [Fact]
+        public void AddsStaticToPropertyWithGetterExpression()
+        {
+            var builder = CodeBuilder.Create("AwesomeApp")
+                .AddClass("SampleClass")
+                .AddProperty("Test")
+                .MakePublicProperty()
+                .WithGetterExpression("\"test\"")
+                .MakeStatic()
+                .SetType("string")
+                .Class;
+
+            var expected = @"namespace AwesomeApp
+{
+    partial class SampleClass
+    {
+        public static string Test => ""test"";
+    }
+}
+";
+            AreEqual(expected, builder);
+        }
+
         private void AreEqual(string expected, ClassBuilder builder)
         {
             var expectedOutput = $@"//------------------------------------------------------------------------------
