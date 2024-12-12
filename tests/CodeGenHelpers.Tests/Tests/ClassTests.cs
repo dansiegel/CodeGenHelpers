@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Globalization;
+using System.Threading;
+using Microsoft.CodeAnalysis;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -39,6 +41,36 @@ namespace CodeGenHelpers.Tests
                 .AddGeneric("T", b => b.AddConstraint("IFoo"));
 
             MakeAssertion(builder);
+        }
+
+        [Fact]
+        public void GenerateInternalClass()
+        {
+            var builder = CodeBuilder.Create(Namespace)
+                .AddClass("InternalClass")
+                .WithAccessModifier(Accessibility.Internal);
+
+            MakeAssertion(builder);
+        }
+
+        [Fact]
+        public void GenerateInternalClassTurkish()
+        {
+            var currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("tr-TR");
+
+            try
+            {
+                var builder = CodeBuilder.Create(Namespace)
+                    .AddClass("InternalClass")
+                    .WithAccessModifier(Accessibility.Internal);
+
+                MakeAssertion(builder);
+            }
+            finally
+            {
+                Thread.CurrentThread.CurrentCulture = currentCulture;
+            }
         }
 
         [Fact]
