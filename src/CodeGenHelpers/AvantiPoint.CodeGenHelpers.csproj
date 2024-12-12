@@ -26,6 +26,7 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="*.cs" PackagePath="build/content" />
       <TfmSpecificPackageFile Include="Internals\*.cs" PackagePath="build/content/Internals" />
+      <TfmSpecificPackageFile Include="Extensions\*.cs" PackagePath="build/content/Internals" />
     </ItemGroup>
   </Target>
 </Project>
