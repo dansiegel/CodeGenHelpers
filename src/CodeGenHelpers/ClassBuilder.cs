@@ -338,7 +338,7 @@ namespace CodeGenHelpers
                 IsSealed ? "sealed" : null,
                 IsAbstract ? "abstract" : null,
                 _isPartial ? "partial" : null,
-                Kind.ToString().ToLower(),
+                Kind.ToString().ToLowerInvariant(),
                 $"{Name}{_generics}",
                 extra
             };

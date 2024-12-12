@@ -195,7 +195,7 @@ the code is regenerated.";
                 writer.NewLine();
 
             if(_nullable != NullableState.Default)
-                writer.AppendLine($"#nullable {_nullable}".ToLower());
+                writer.AppendLine($"#nullable {_nullable}".ToLowerInvariant());
 
             WriteAssemblyAttributes(_assemblyAttributes, ref writer);
             if(_topLevel)
