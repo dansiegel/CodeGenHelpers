@@ -6,7 +6,7 @@ The CodeGenHelpers is built to help people to write C# Code generators. If you l
 |----|:---:|
 | [AvantiPoint.CodeGenHelpers](https://www.nuget.org/packages/AvantiPoint.CodeGenHelpers/) | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/AvantiPoint.CodeGenHelpers?style=plastic) |
 
-> Note: Version 2.0 will no longer ship as source code linked into your project and will now ship as a pre-compiled library.
+> Note: Version 2.0 will no longer ship as source code linked into your project by default and will now ship as a pre-compiled library. To include the helpers as source, set `<CodeGenHelpersMode>source</CodeGenHelpersMode>` in your project.
 
 ## Why Use the Helpers?
 

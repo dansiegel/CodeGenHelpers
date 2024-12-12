@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+
+  <Target Name="RemoveAssemblyReferenceOnSourceMode"
+          BeforeTargets="FindReferenceAssembliesForReferences"
+          Condition=" '$(CodeGenHelpersMode)' == 'Source' ">
+
+    <ItemGroup>
+      <_CodeGenHelpersReferenceToRemove
+				  Include="@(ReferencePath)"
+				  Condition=" '%(ReferencePath.NuGetPackageId)' == 'AvantiPoint.CodeGenHelpers' " />
+
+      <!-- Remove all references -->
+      <ReferencePath Remove="@(_CodeGenHelpersReferenceToRemove)" />
+      <ReferenceCopyLocalPaths Remove="@(_CodeGenHelpersReferenceToRemove)" />
+
+      <!-- Clear items -->
+      <_CodeGenHelpersReferenceToRemove Remove="@(_CodeGenHelpersReferenceToRemove)" />
+    </ItemGroup>
+
+  </Target>
+
+</Project>

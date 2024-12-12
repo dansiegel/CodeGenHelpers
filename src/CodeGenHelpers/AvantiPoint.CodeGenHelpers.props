@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+
+  <PropertyGroup>
+    <CodeGenHelpersMode Condition=" '$(CodeGenHelpersMode)' == '' ">Assembly</CodeGenHelpersMode>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(CodeGenHelpersMode)' == 'Source' ">
+    <Compile Include="$(MSBuildThisFileDirectory)content\**\*.cs" LinkBase="CodeGenHelpers" />
+  </ItemGroup>
+
+</Project>

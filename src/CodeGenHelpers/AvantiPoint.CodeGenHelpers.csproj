@@ -9,7 +9,7 @@
     <PackageTags>source generators;codegen;avantipoint;roslyn</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>latest</LangVersion>
-
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddGeneratorsToOutput</TargetsForTfmSpecificContentInPackage>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>$(NoWarn);NU5128;</NoWarn>
   </PropertyGroup>
@@ -18,5 +18,15 @@
     <InternalsVisibleTo Include="CodeGenHelpers.Tests" />
     <None Update="ReadMe.txt" Pack="true" PackagePath="" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" />
+    <None Include="AvantiPoint.CodeGenHelpers.props" Pack="true" PackagePath="build" />
+    <None Include="AvantiPoint.CodeGenHelpers.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
+
+  <Target Name="_AddGeneratorsToOutput">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="*.cs" PackagePath="build/content" />
+      <TfmSpecificPackageFile Include="Internals\*.cs" PackagePath="build/content/Internals" />
+      <TfmSpecificPackageFile Include="Extensions\*.cs" PackagePath="build/content/Extensions" />
+    </ItemGroup>
+  </Target>
 </Project>
