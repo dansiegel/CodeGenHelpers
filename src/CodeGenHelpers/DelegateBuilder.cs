@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers;
 
+#nullable enable
 public sealed class DelegateBuilder : BuilderBase<DelegateBuilder>, IParameterized<DelegateBuilder>
 {
     private ParameterDocumentationComment? _xmlDoc;

@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AvantiPoint.CodeGenHelpers.Extensions;
 
+#nullable enable
 public static class RoslynExtensions
 {
     /// <summary>

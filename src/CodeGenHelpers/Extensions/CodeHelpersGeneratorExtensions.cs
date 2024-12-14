@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Microsoft.CodeAnalysis;
 
+#nullable enable
 public static class CodeHelpersGeneratorExtensions
 {
     /// <summary>
