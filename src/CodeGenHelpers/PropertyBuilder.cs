@@ -125,6 +125,7 @@ namespace CodeGenHelpers
             AccessModifier = accessModifier;
             return this;
         }
+
         public PropertyBuilder Override(bool @override = true)
         {
             _override = @override;
@@ -134,7 +135,11 @@ namespace CodeGenHelpers
         public PropertyBuilder MakeStatic()
         {
             IsStatic = true;
-            FieldTypeValue = FieldType.Const;
+            if (string.IsNullOrEmpty(_getterExpression))
+            {
+                FieldTypeValue = FieldType.Const;
+            }
+
             return this;
         }
 
@@ -173,6 +178,7 @@ namespace CodeGenHelpers
         public PropertyBuilder WithGetterExpression(string expression)
         {
             _getterExpression = expression;
+            FieldTypeValue = FieldType.Property;
             return this;
         }
 

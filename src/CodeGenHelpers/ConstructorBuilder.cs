@@ -206,7 +206,7 @@ namespace CodeGenHelpers
 
             var modifier = AccessModifier switch
             {
-                null => Class.AccessModifier.ToString().ToLower(),
+                null => Class.AccessModifier.ToString().ToLowerInvariant(),
                 _ => AccessModifier.Code()
             };
             var parameters = _parameters.Any() ? string.Join(", ", _parameters.Select(x => x.ToString())) : string.Empty;

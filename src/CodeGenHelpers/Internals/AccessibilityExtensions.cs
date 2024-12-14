@@ -11,7 +11,7 @@ namespace CodeGenHelpers.Internals
                 Accessibility.ProtectedAndInternal => "private protected",
                 Accessibility.ProtectedOrInternal => "protected internal",
                 Accessibility.NotApplicable => null,
-                _ => accessModifier.ToString().ToLower()
+                _ => accessModifier.ToString().ToLowerInvariant()
             };
 
         public static string? Code(this Accessibility? accessModifier) =>
