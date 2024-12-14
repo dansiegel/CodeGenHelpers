@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeGenHelpers.Extensions;
 
+#nullable enable
 public static class SymbolExtensions
 {
     public static string GetQualifiedTypeName(this ITypeSymbol typeSymbol)
