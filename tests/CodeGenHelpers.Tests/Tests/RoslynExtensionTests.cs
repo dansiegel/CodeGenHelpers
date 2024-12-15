@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using AvantiPoint.CodeGenHelpers.Extensions;
+using CodeGenHelpers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -96,7 +96,9 @@ public class RoslynExtensionTests
 
         var root = syntaxTree.GetCompilationUnitRoot();
         var @class = root.DescendantNodes()?.OfType<ClassDeclarationSyntax>().FirstOrDefault();
+        Assert.NotNull(@class);
         var symbol = compilation.GetSemanticModel(syntaxTree).GetDeclaredSymbol(@class);
+        Assert.NotNull(symbol);
         var attribute = symbol.GetAttributes().First();
 
         // act
@@ -136,7 +138,9 @@ public class RoslynExtensionTests
         var @class = root.DescendantNodes()?.OfType<ClassDeclarationSyntax>()
             .Single(x => x.AttributeLists.Count > 0);
 
+        Assert.NotNull(@class);
         var symbol = compilation.GetSemanticModel(syntaxTree).GetDeclaredSymbol(@class);
+        Assert.NotNull(symbol);
         var attribute = symbol.GetAttributes().First();
 
         var expected = "True";
@@ -170,7 +174,9 @@ public class RoslynExtensionTests
             syntaxTrees: new[] { syntaxTree });
         var root = syntaxTree.GetCompilationUnitRoot();
         var @class = root.DescendantNodes()?.OfType<ClassDeclarationSyntax>().FirstOrDefault();
+        Assert.NotNull(@class);
         var symbol = compilation.GetSemanticModel(syntaxTree).GetDeclaredSymbol(@class);
+        Assert.NotNull(symbol);
         var attribute = symbol.GetAttributes().First();
 
         //// act

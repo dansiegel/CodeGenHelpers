@@ -34,7 +34,7 @@ namespace CodeGenHelpers
             where T : BuilderBase<T>, IParameterized<T>
         {
             parameterized.Parent.AddNamespaceImport(typeSymbol);
-            return parameterized.AddParameter(typeSymbol.GetGloballyQualifiedTypeName(), parameterName);
+            return parameterized.AddParameter(SymbolHelpers.GetGloballyQualifiedTypeName(typeSymbol), parameterName);
         }
 
         public static T AddParameter<T>(this IParameterized<T> parameterized, string typeName, string parameterName, int index)

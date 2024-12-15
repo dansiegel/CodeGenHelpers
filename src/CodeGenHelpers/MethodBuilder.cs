@@ -226,7 +226,7 @@ namespace CodeGenHelpers
                 output = $"static {output}";
 
             var parameters = string.Join(", ", _parameters.Select(x => x.ToString()));
-            output = $"{AccessModifier.Code()} {output} {Name}{_generics}({parameters})";
+            output = $"{AccessibilityHelpers.Code(AccessModifier)} {output} {Name}{_generics}({parameters})";
 
             if(_xmlDoc is ParameterDocumentationComment parameterDocumentation)
                 parameterDocumentation.RemoveUnusedParameters(_parameters);

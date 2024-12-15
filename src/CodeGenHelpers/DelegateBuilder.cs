@@ -140,7 +140,7 @@ public sealed class DelegateBuilder : BuilderBase<DelegateBuilder>, IParameteriz
         var parameters = _parameters.Any() ? string.Join(", ", _parameters.Select(x => x.ToString())) : string.Empty;
         var parts = new string?[]
         {
-            AccessModifier.Code(),
+            AccessibilityHelpers.Code(AccessModifier),
             "delegate",
             ReturnType is null || string.IsNullOrEmpty(ReturnType) ? "void" : ReturnType.Trim(),
             $"{Name}{_generics}({parameters})",

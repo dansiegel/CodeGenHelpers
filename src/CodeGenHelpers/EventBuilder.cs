@@ -175,7 +175,7 @@ namespace CodeGenHelpers
             }
 
             var @static = _static ? "static " : string.Empty;
-            var eventDeclaration = $"{_declaredAccessibility.Code()} {@static}event {_eventDelegateType} {Name}";
+            var eventDeclaration = $"{AccessibilityHelpers.Code(_declaredAccessibility)} {@static}event {_eventDelegateType} {Name}";
             if(!string.IsNullOrEmpty(_explicitImplementation))
             {
                 eventDeclaration = $"event {@static}{_eventDelegateType} {_explicitImplementation}.{Name}";

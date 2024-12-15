@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CodeGenHelpers.Extensions;
 using Microsoft.CodeAnalysis;
 
 #pragma warning disable IDE0008
@@ -11,7 +10,7 @@ using Microsoft.CodeAnalysis;
 #nullable enable
 namespace CodeGenHelpers.Internals
 {
-    internal static class ISymbolExtensions
+    internal static class SymbolHelpers
     {
         private static readonly Dictionary<string, string> _fullNamesMaping = new Dictionary<string, string>
             (StringComparer.OrdinalIgnoreCase)
@@ -30,7 +29,7 @@ namespace CodeGenHelpers.Internals
                 { "bool",       typeof(bool).ToString()    },
             };
 
-        public static string GetGloballyQualifiedTypeName(this INamespaceOrTypeSymbol symbol)
+        public static string GetGloballyQualifiedTypeName(INamespaceOrTypeSymbol symbol)
         {
             var value = GetFullMetadataName(symbol);
             if(_fullNamesMaping.Any(x => x.Value == value))
@@ -45,7 +44,7 @@ namespace CodeGenHelpers.Internals
             return value;
         }
 
-        public static string GetFullMetadataName(this INamespaceOrTypeSymbol symbol)
+        public static string GetFullMetadataName(INamespaceOrTypeSymbol symbol)
         {
             ISymbol s = symbol;
             var sb = new StringBuilder(s.MetadataName);
@@ -55,7 +54,7 @@ namespace CodeGenHelpers.Internals
 
             if (s == null)
             {
-                return symbol.GetFullName();
+                return GetFullName(symbol);
             }
 
             while (!IsRootNamespace(s))
@@ -89,16 +88,16 @@ namespace CodeGenHelpers.Internals
             return s is INamespaceSymbol symbol && symbol.IsGlobalNamespace;
         }
 
-        public static string GetFullName(this INamespaceOrTypeSymbol type)
+        public static string GetFullName(INamespaceOrTypeSymbol type)
         {
             if (type is IArrayTypeSymbol arrayType)
             {
-                return $"{arrayType.ElementType.GetFullName()}[]";
+                return $"{GetFullName(arrayType.ElementType)}[]";
             }
 
-            if (((ITypeSymbol)type).IsNullable(out var t) && t != null)
+            if (IsNullable((ITypeSymbol)type, out var t) && t != null)
             {
-                return $"System.Nullable`1[{t.GetFullName()}]";
+                return $"System.Nullable`1[{GetFullName(t)}]";
             }
 
             var name = type.ToDisplayString() ?? string.Empty;
@@ -109,6 +108,69 @@ namespace CodeGenHelpers.Internals
             }
 
             return output;
+        }
+
+        public static string GetQualifiedTypeName(ITypeSymbol typeSymbol)
+        {
+            var type = typeSymbol.GetTypeName();
+            if (!type.Contains(".") || typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+            {
+                return type;
+            }
+
+            var @namespace = namedTypeSymbol.ContainingNamespace.ToString();
+            var typeName = namedTypeSymbol.Name;
+
+            if (typeSymbol.ContainingType is not null)
+            {
+                return $"{GetQualifiedTypeName(typeSymbol.ContainingType)}.{typeSymbol.Name}";
+            }
+
+            var fullyQualifiedName = $"{@namespace}.{typeName}";
+
+            if (namedTypeSymbol.IsGenericType)
+            {
+                var generics = namedTypeSymbol.TypeArguments.Select(x => GetQualifiedTypeName(x));
+                var baseName = fullyQualifiedName;
+                var nullable = string.Empty;
+                if (baseName.EndsWith("?", StringComparison.InvariantCulture))
+                {
+                    baseName = baseName.Substring(0, baseName.Length - 1);
+                    nullable = "?";
+                }
+
+                fullyQualifiedName = $"{baseName}<{string.Join(", ", generics)}>{nullable}";
+            }
+
+            if (fullyQualifiedName.Contains(".") && !fullyQualifiedName.StartsWith("global::", StringComparison.InvariantCulture))
+            {
+                fullyQualifiedName = $"global::{fullyQualifiedName}";
+            }
+
+            return fullyQualifiedName;
+        }
+
+        public static bool IsNullable(ITypeSymbol type)
+        {
+            if (type.NullableAnnotation == NullableAnnotation.Annotated)
+                return true;
+
+            return ((type as INamedTypeSymbol)?.IsGenericType ?? false)
+                && type.OriginalDefinition.ToDisplayString().Equals("System.Nullable<T>", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsNullable(ITypeSymbol type, out ITypeSymbol? nullableType)
+        {
+            if (IsNullable(type))
+            {
+                nullableType = type.NullableAnnotation == NullableAnnotation.Annotated ? type : ((INamedTypeSymbol)type).TypeArguments.First();
+                return true;
+            }
+            else
+            {
+                nullableType = null;
+                return false;
+            }
         }
     }
 }

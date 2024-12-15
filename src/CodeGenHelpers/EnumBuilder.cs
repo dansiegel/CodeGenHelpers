@@ -110,7 +110,7 @@ namespace CodeGenHelpers
 
             var parts = new[]
             {
-                AccessModifier.Code(),
+                AccessibilityHelpers.Code(AccessModifier),
                 "enum",
                 Name
             };
