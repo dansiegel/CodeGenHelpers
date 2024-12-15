@@ -169,6 +169,11 @@ namespace CodeGenHelpers
 
         internal override void Write(in CodeWriter writer)
         {
+            if (Warning is not null)
+            {
+                writer.AppendLine("#warning " + Warning);
+            }
+
             var @static = _static ? "static " : string.Empty;
             var eventDeclaration = $"{_declaredAccessibility.Code()} {@static}event {_eventDelegateType} {Name}";
             if(!string.IsNullOrEmpty(_explicitImplementation))

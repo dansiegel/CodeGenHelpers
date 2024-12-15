@@ -307,6 +307,11 @@ namespace CodeGenHelpers
         {
             _xmlDoc?.Write(writer);
 
+            if (Warning is not null)
+            {
+                writer.AppendLine("#warning " + Warning);
+            }
+
             WriteClassAttributes(_classAttributes, writer);
 
             var staticDeclaration = IsStatic ? "static " : string.Empty;

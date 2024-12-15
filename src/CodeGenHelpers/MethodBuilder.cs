@@ -207,6 +207,11 @@ namespace CodeGenHelpers
 
         internal override void Write(in CodeWriter writer)
         {
+            if (Warning is not null)
+            {
+                writer.AppendLine("#warning " + Warning);
+            }
+
             var output = ReturnType is null || string.IsNullOrEmpty(ReturnType) ? "void" : ReturnType.Trim();
             if (IsAsync)
                 output = $"async {output}";

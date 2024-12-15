@@ -27,6 +27,7 @@ namespace CodeGenHelpers
         private Action<ICodeWriter>? _setter;
         private string? _setterExpression;
         private string? _value;
+        private string? _warning;
         private bool _getOnly;
         private bool _virtual;
         private bool _override;
@@ -104,6 +105,12 @@ namespace CodeGenHelpers
         }
 
         public PropertyBuilder SetType<T>() => SetType(typeof(T));
+
+        public PropertyBuilder SetWarning(string warning)
+        {
+            _warning = warning;
+            return this;
+        }
 
         public PropertyBuilder MakePublicProperty() => WithAccessModifier(Accessibility.Public);
 
@@ -237,6 +244,11 @@ namespace CodeGenHelpers
         void IBuilder.Write(in CodeWriter writer)
         {
             _xmlDoc?.Write(writer);
+
+            if (_warning is not null)
+            {
+                writer.AppendLine("#warning " + _warning);
+            }
 
             foreach (var attribute in _attributes)
                 writer.AppendLine($"[{attribute}]");

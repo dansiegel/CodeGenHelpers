@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Xunit;
 
 namespace CodeGenHelpers.Tests
@@ -167,6 +167,29 @@ namespace CodeGenHelpers.Tests
     partial class SampleClass
     {
         public new const string Equals = ""foo"";
+    }
+}
+";
+
+            AreEqual(expected, builder);
+        }
+
+        [Fact]
+        public void AddsWarning()
+        {
+            var builder = CodeBuilder.Create("AwesomeApp")
+                .AddClass("SampleClass");
+
+            builder.AddProperty("Foo")
+                .SetWarning("boo")
+                .SetType("string");
+
+            var expected = @"namespace AwesomeApp
+{
+    partial class SampleClass
+    {
+        #warning boo
+        string Foo;
     }
 }
 ";
