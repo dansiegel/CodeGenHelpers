@@ -34,7 +34,7 @@ namespace CodeGenHelpers.Internals
             if (symbol.ContainingNamespace.Name == "System" && _mappings.ContainsKey(symbol.Name))
                 return _mappings[symbol.Name];
 
-            return symbol.GetFullMetadataName();
+            return SymbolHelpers.GetFullMetadataName(symbol);
         }
 
         public static string GetTypeName(this Type type)

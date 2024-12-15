@@ -114,7 +114,7 @@ namespace CodeGenHelpers
         {
             if(symbol.Name == Name)
             {
-                BaseClass = $"global::{symbol.GetFullMetadataName()}";
+                BaseClass = $"global::{SymbolHelpers.GetFullMetadataName(symbol)}";
                 return this;
             }
 
@@ -338,7 +338,7 @@ namespace CodeGenHelpers
                 IsAbstract = true;
 
             var classDeclaration = new[] {
-                AccessModifier.Code(),
+                AccessibilityHelpers.Code(AccessModifier),
                 IsStatic ? "static" : null,
                 IsSealed ? "sealed" : null,
                 IsAbstract ? "abstract" : null,

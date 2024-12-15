@@ -97,7 +97,7 @@ namespace CodeGenHelpers
 
             if (PropertyType == RecordPropertyType.Init)
             {
-                using (writer.Block($"{AccessModifier.Code()} record {Name}"))
+                using (writer.Block($"{AccessibilityHelpers.Code(AccessModifier)} record {Name}"))
                 {
                     foreach (RecordPropertyBuilder property in _properties)
                     {
@@ -109,7 +109,7 @@ namespace CodeGenHelpers
             }
 
             var properties = _properties.Any() ? string.Join(", ", _properties.Select(x => x.ToPositionalProperty())) : string.Empty;
-            writer.AppendLine($"{AccessModifier.Code()} record {Name}({properties});");
+            writer.AppendLine($"{AccessibilityHelpers.Code(AccessModifier)} record {Name}({properties});");
         }
 
         public override RecordBuilder AddNamespaceImport(string importedNamespace)

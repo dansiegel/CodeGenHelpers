@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace AvantiPoint.CodeGenHelpers.Extensions;
+namespace CodeGenHelpers.Extensions;
 
 #nullable enable
 public static class RoslynExtensions

@@ -41,7 +41,7 @@ namespace CodeGenHelpers
         public string ToInitProperty()
         {
             string defaultValue = HasDefaultValue ? $" = {DefaultValue};" : string.Empty;
-            return $"{AccessModifier.Code()} {Type} {Name} {{ get; init; }}{defaultValue}";
+            return $"{AccessibilityHelpers.Code(AccessModifier)} {Type} {Name} {{ get; init; }}{defaultValue}";
         }
 
         public RecordPropertyBuilder WithDefaultValue(string defaultValue)

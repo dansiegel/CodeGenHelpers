@@ -275,11 +275,11 @@ namespace CodeGenHelpers
 
             var output = (FieldTypeValue switch
             {
-                FieldType.Const => $"{AccessModifier.Code()}{isNew} const {type} {name}",
-                FieldType.ReadOnly => $"{AccessModifier.Code()}{isNew}{_static} readonly {type} {name}",
+                FieldType.Const => $"{AccessibilityHelpers.Code(AccessModifier)}{isNew} const {type} {name}",
+                FieldType.ReadOnly => $"{AccessibilityHelpers.Code(AccessModifier)}{isNew}{_static} readonly {type} {name}",
                 _ => additionalModifier is null
-                    ? $"{AccessModifier.Code()}{isNew}{_static} {type} {name}"
-                    : $"{AccessModifier.Code()} {additionalModifier} {type} {name}"
+                    ? $"{AccessibilityHelpers.Code(AccessModifier)}{isNew}{_static} {type} {name}"
+                    : $"{AccessibilityHelpers.Code(AccessModifier)} {additionalModifier} {type} {name}"
             }).Trim();
 
             var maxCharacters = (value?.StartsWith("\"") ?? false) ? 9 : 5;
@@ -312,7 +312,7 @@ namespace CodeGenHelpers
                     return;
                 }
 
-                var set = $"{_setterAccessibility.Code()} set".Trim();
+                var set = $"{AccessibilityHelpers.Code(_setterAccessibility)} set".Trim();
                 writer.AppendLine($"{output} {{ get; {set}; }}");
                 return;
             }
