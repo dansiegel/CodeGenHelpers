@@ -69,10 +69,48 @@ the code is regenerated.";
 
         public static ClassBuilder Create(ITypeSymbol typeSymbol, IndentStyle indentStyle = IndentStyle.Spaces)
         {
+            var containingTypes = new List<ITypeSymbol>();
+
+            if (typeSymbol.ContainingType != null)
+            {
+                var currentType = typeSymbol;
+
+                while (currentType.ContainingType is { } containingType)
+                {
+                    containingTypes.Add(containingType);
+                    currentType = containingType;
+                }
+
+                containingTypes.Reverse();
+            }
+
             var builder = Create(typeSymbol.ContainingNamespace, indentStyle);
-            return builder.AddClass(typeSymbol.Name)
+            ClassBuilder? classBuilder = null;
+
+            foreach (var containingType in containingTypes)
+            {
+                classBuilder = AddClass(containingType.Name)
+                    .WithAccessModifier(containingType.DeclaredAccessibility)
+                    .OfType(containingType.TypeKind);
+            }
+
+            return AddClass(typeSymbol.Name)
                 .WithAccessModifier(typeSymbol.DeclaredAccessibility)
                 .OfType(typeSymbol.TypeKind);
+
+            ClassBuilder AddClass(string name)
+            {
+                if (classBuilder != null)
+                {
+                    classBuilder = classBuilder.AddNestedClass(name, true);
+                }
+                else
+                {
+                    classBuilder = builder.AddClass(name);
+                }
+
+                return classBuilder;
+            }
         }
 
         public CodeBuilder AddNamespaceImport(string importedNamespace)
