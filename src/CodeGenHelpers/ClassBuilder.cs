@@ -343,7 +343,7 @@ namespace CodeGenHelpers
                 IsSealed ? "sealed" : null,
                 IsAbstract ? "abstract" : null,
                 _isPartial ? "partial" : null,
-                Kind.ToString().ToLowerInvariant(),
+                KindKeyword(Kind),
                 $"{Name}{_generics}",
                 extra
             };
@@ -392,6 +392,9 @@ namespace CodeGenHelpers
                 InvokeBuilderWrite(_nestedClass, ref hadOutput, writer);
             }
         }
+
+        private static string KindKeyword(TypeKind kind) =>
+            kind == TypeKind.Struct ? "struct" : kind.ToString().ToLowerInvariant();
 
         private static void WriteClassAttributes(IEnumerable<string> classAttributes, in CodeWriter writer)
         {
